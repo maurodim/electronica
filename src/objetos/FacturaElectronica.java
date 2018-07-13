@@ -4,6 +4,7 @@ package objetos;
 
 import conversiones.Numeros;
 import feafip.bi.ClassFactory;
+import feafip.bi.IContribuyente;
 import feafip.bi.Iwsfev1;
 import feafip.bi.TipoComprobante;
 import interfaces.FacturableE;
@@ -36,7 +37,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
     private Integer idFactura;
     private Integer idCliente;
     private String fecha;
-    private String customerId;
+    private float customerId;
     private String customerTypeDoc;
     private String tipoComprobante;
     private Double importeTotal;
@@ -58,7 +59,13 @@ public class FacturaElectronica implements FacturableE,Instalable{
     private String razonSocial;
     private String direccionCliente;
     private String condicionIvaCliente;
+    private ArrayList listadoDetalle;
 
+    public ArrayList getListadoDetalle() {
+        return listadoDetalle;
+    }
+    
+    
     public String getCondicionIvaCliente() {
         return condicionIvaCliente;
     }
@@ -123,11 +130,11 @@ public class FacturaElectronica implements FacturableE,Instalable{
         this.fecha = fecha;
     }
 
-    public String getCustomerId() {
+    public float getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(String customerId) {
+    public void setCustomerId(float customerId) {
         this.customerId = customerId;
     }
 
@@ -297,15 +304,18 @@ public class FacturaElectronica implements FacturableE,Instalable{
         String FechaComp = formatter.format(new Date());
          
         Iwsfev1 wsfev1 = ClassFactory.createwsfev1();
-        float cuitV=Float.parseFloat(this.cuitVendedor+".0");
-        float cuitC=Float.parseFloat(this.customerId+".0");
+        float cuitV=(float) 20229053834.0;
+        //float cuitC=this.customerId;
         int customerTD=Integer.parseInt(this.customerTypeDoc);
         String montoT=String.valueOf(this.importeTotal);
         String montoN=String.valueOf(this.importeNeto);
         String montoI=String.valueOf(this.impuestoLiquido);
         //wsfev1.cuit(20229053834.0);  // Cuit del vendedor
-        wsfev1.cuit(cuitV); 
+        wsfev1.cuit(cuitV);
+        System.out.println(this.customerId+" convertido: "+Float.valueOf("30538872128").floatValue());
+        //JOptionPane.showMessageDialog(null,"Fecha "+FechaComp);
         wsfev1.url(URLWSW);
+        System.out.println(URLWSW+" wsaa "+URLWSAA);
         if (wsfev1.login(this.archivoCrt, this.archivoKey, URLWSAA)){
             if (!wsfev1.sfRecuperaLastCMP(ptoVta, tipoComp.comEnumValue())) {
                 JOptionPane.showMessageDialog(null,wsfev1.errorDesc());
@@ -313,23 +323,29 @@ public class FacturaElectronica implements FacturableE,Instalable{
                 nro = wsfev1.sfLastCMP() + 1;
                 wsfev1.reset();
                 if(this.condicionIvaVendedor.equals("2")){
-                    wsfev1.agregaFactura(this.tipoVta,customerTD, cuitC, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, "", "", "", "PES", 1);
+                    wsfev1.agregaFactura(this.tipoVta,customerTD, this.customerId, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, "", "", "", "PES", 1);
                     //wsfev1.agregaFactura(2, 99,0.0, nro, nro, FechaComp, 1.5, 0, 1.5, 0, FechaComp, FechaComp, FechaComp, "PES", 1);
-                    Iterator itI=this.listadoIva.listIterator();
-                    Iterator itT=this.listadoTributos.listIterator();
+                    
+                    
                     TiposIva tipoI;
                     Tributos tributos;
-                    while(itI.hasNext()){
-                        tipoI=(TiposIva) itI.next();
-                        wsfev1.agregaIVA(tipoI.getId(),tipoI.getBaseImponible(),tipoI.getImporte()); // Ver Excel de referencias de codigos AFIP
-                        //wsfev1.agregaIVA(1, 0,0); // Ver Excel de referencias de codigos AFIP
+                    if(this.listadoIva !=null){
+                        Iterator itI=this.listadoIva.listIterator();
+                        while(itI.hasNext()){
+                            tipoI=(TiposIva) itI.next();
+                            wsfev1.agregaIVA(tipoI.getId(),tipoI.getBaseImponible(),tipoI.getImporte()); // Ver Excel de referencias de codigos AFIP
+                            //wsfev1.agregaIVA(1, 0,0); // Ver Excel de referencias de codigos AFIP
+                        }
                     }
-                    while(itT.hasNext()){
-                        tributos=(Tributos) itT.next();
-                        wsfev1.agregaTributo(tributos.getId(),tributos.getDescripcion(),tributos.getBaseImponible(),tributos.getAlicuota(),tributos.getImporte());
+                    if(this.listadoTributos !=null){
+                        Iterator itT=this.listadoTributos.listIterator();
+                        while(itT.hasNext()){
+                            tributos=(Tributos) itT.next();
+                            wsfev1.agregaTributo(tributos.getId(),tributos.getDescripcion(),tributos.getBaseImponible(),tributos.getAlicuota(),tributos.getImporte());
+                        }
                     }
                 }else{
-                    wsfev1.agregaFactura(this.tipoVta,customerTD, cuitC, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, FechaComp,FechaComp,FechaComp, "PES", 1);
+                    wsfev1.agregaFactura(this.tipoVta,customerTD, 30538872128.0, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, FechaComp,FechaComp,FechaComp, "PES", 1);
                 }
                 if (!wsfev1.autorizar(ptoVta, (TipoComprobante)tipoComp)){
                     JOptionPane.showMessageDialog(null,wsfev1.errorDesc());
@@ -340,6 +356,12 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         this.caeVto=wsfev1.sfVencimiento(0);
                         this.afipPlastId=String.valueOf(nro);
                         this.afipPlastCbte=String.valueOf(nro);
+                        this.tipoComprobante=String.valueOf((TipoComprobante)tipoComp);
+                        this.fechaCae=FechaComp;
+                        
+                        //IContribuyente iContribuyente=ClassFactory.createContribuyente();
+                        //System.out.println(iContribuyente.condicionIVADesc()+" numero iva "+iContribuyente.condicionIVA().comEnumValue());
+                        this.estado=1;
                         //ACA DEBERÍA PASAR LOS VALORES A PDF PARA QUE SE GENERE LA FACTURA
                         
                         pdfsJavaGenerador pdf=new pdfsJavaGenerador();
@@ -958,7 +980,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
     }
 
     @Override
-    public Integer generar(Connection conexion, int Condicion, String archivoKey, String archivoCrt, Integer idCliente, String cuitCliente, int tipoDocumentoCliente, int tipoComprobante, Double montoTotal, Double montoBruto, Double montoIva,int ptoDeVenta,String cuitVendedor,int tipoV,ArrayList lstI,ArrayList lstT,String razonSocial,String direccion,String condicionIvaCliente) {
+    public Integer generar(Connection conexion, int Condicion, String archivoKey, String archivoCrt, Integer idCliente, float cuitCliente, int tipoDocumentoCliente, int tipoComprobante, Double montoTotal, Double montoBruto, Double montoIva,int ptoDeVenta,String cuitVendedor,int tipoV,ArrayList lstI,ArrayList lstT,String razonSocial,String direccion,String condicionIvaCliente,ArrayList lstDetalle) {
         FacturaElectronica fE=new FacturaElectronica();
         fE.listadoIva=new ArrayList();
         fE.listadoTributos=new ArrayList();
@@ -981,7 +1003,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
         fE.razonSocial=razonSocial;
         fE.direccionCliente=direccion;
         fE.condicionIvaCliente=condicionIvaCliente;
-        
+        fE.listadoDetalle=lstDetalle;
         if(fE.condicionIvaVendedor.equals("2")){
             
             

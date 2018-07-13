@@ -8,6 +8,7 @@ package ifu.demo;
 import interfaces.FacturableE;
 import java.sql.Connection;
 import java.util.ArrayList;
+import objetos.DetalleFacturas;
 import objetos.FacturaElectronica;
 
 /**
@@ -23,15 +24,15 @@ public class FEAFIPDemo {
         
         FacturableE factu=new FacturaElectronica();
         Connection conexion=null;
-        int condicion=2;
+        int condicion=1;
         String archivoKey="clave.key";
         String archivoCrt="certificado.crt";
         int idCliente=1;
-        String cuitCliente="30538872128";
+        float cuitCliente=(float) 30538872128.0;
         int tipoD=80;//80- cuit 96- dni
         int tipoC=1;
-        Double montoT=10.0;
-        Double montoB=10.0;
+        Double montoT=1.0;
+        Double montoB=1.0;
         Double montoI=0.0;
         int ptoVta=3;
         String cuitVendedor="20229053834";
@@ -42,8 +43,15 @@ public class FEAFIPDemo {
         listadoT=null;
         String razon="CONFEDERACION ARGENTINA DE LA MED EMPRESA (CAME)";
         String direc="L. N. ALEM 452 - 1003 CABA";
-        String condicionIvaC="EXENTO";
-        factu.generar(conexion, condicion, archivoKey, archivoCrt, idCliente, cuitCliente, tipoD, tipoC, montoT,montoB,montoI,ptoVta, cuitVendedor,tVta,listadoI,listadoT,razon,direc,condicionIvaC);
+        String condicionIvaC="3";
+        ArrayList <DetalleFacturas> lstDetalle=new ArrayList();
+        DetalleFacturas detalle=new DetalleFacturas();
+        detalle.setIdArticulo(1);
+        detalle.setDescripcionArticulo("en una prueba");
+        detalle.setCantidad(1.0);
+        detalle.setPrecioUnitario(1.0);
+        lstDetalle.add(detalle);
+        factu.generar(conexion, condicion, archivoKey, archivoCrt, idCliente, cuitCliente, tipoD, tipoC, montoT,montoB,montoI,ptoVta, cuitVendedor,tVta,listadoI,listadoT,razon,direc,condicionIvaC,lstDetalle);
         /*
         MainFrame mainFrame = new MainFrame();
         mainFrame.setVisible(true);

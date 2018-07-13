@@ -70,12 +70,12 @@ public class pdfsJavaGenerador {
         
         try {
             EncabezadoPdf encabezado=new EncabezadoPdf(this.punto,this.numero);
-            cliente=new EncabezadoClientes(doc.getRazonSocial(),doc.getCondicionIvaCliente(),doc.getDireccionCliente(),doc.getCustomerTypeDoc(),doc.getCustomerId());
+            cliente=new EncabezadoClientes(doc.getRazonSocial(),doc.getCondicionIvaCliente(),doc.getDireccionCliente(),doc.getCustomerTypeDoc(),String.valueOf(doc.getCustomerId()));
             DetalleFacturas saldo=new DetalleFacturas();
             //Facturable cotizable=new DetalleFacturas();
             ArrayList listado=new ArrayList();
             //listado=cotizable.cargarDetallefactura(doc.getIdFactura());
-            listado=this.lstDetalle;
+            listado=doc.getListadoDetalle();
             fichero=new FileOutputStream(arch);
             PdfWriter writer=PdfWriter.getInstance(documento, fichero);
             documento.open();
@@ -160,8 +160,16 @@ public class pdfsJavaGenerador {
             cb.setFontAndSize(bf,22);
             cb.setTextMatrix(360,770);
             
-            Integer comF=Integer.parseInt(doc.getTipoComprobante());
-            
+            Integer comF=0;
+            if(doc.getTipoComprobante().equals("tcFacturaA"))comF=1;
+            if(doc.getTipoComprobante().equals("tcNotaDebitoA"))comF=2;
+            if(doc.getTipoComprobante().equals("tcNotaCreditoA"))comF=3;
+            if(doc.getTipoComprobante().equals("tcFacturaB"))comF=6;
+            if(doc.getTipoComprobante().equals("tcNotaDebitoB"))comF=7;
+            if(doc.getTipoComprobante().equals("tcNotaCreditoB"))comF=8;
+            if(doc.getTipoComprobante().equals("tcFacturaC"))comF=11;
+            if(doc.getTipoComprobante().equals("tcNotaDebitoC"))comF=12;
+            if(doc.getTipoComprobante().equals("tcNotaCreditoC"))comF=13;
             String len=doc.getAfipPlastCbte();
         int cantiL=len.length();
         String cero="0";
@@ -281,11 +289,11 @@ public class pdfsJavaGenerador {
             bf = BaseFont.createFont(BaseFont.HELVETICA,BaseFont.CP1252,BaseFont.NOT_EMBEDDED);
             cb.setFontAndSize(bf,9);
             cb.setTextMatrix(25,685);
-            cb.showText("Período Facturado Desde: "+doc.getFechaCae().substring(0,10));
+            cb.showText("Período Facturado Desde: "+doc.getFechaCae());
             cb.setTextMatrix(240,685);
-            cb.showText("Hasta: "+doc.getFechaCae().substring(0,10));
+            cb.showText("Hasta: "+doc.getFechaCae());
             cb.setTextMatrix(360,685);
-            cb.showText("Fecha de Vto. para el pago: "+doc.getFechaCae().substring(0,10));
+            cb.showText("Fecha de Vto. para el pago: "+doc.getFechaCae());
             
             //fin segundo recuadro
             
