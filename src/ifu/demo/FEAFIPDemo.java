@@ -28,7 +28,7 @@ public class FEAFIPDemo {
         String archivoKey="clave.key";
         String archivoCrt="certificado.crt";
         int idCliente=1;
-        float cuitCliente=(float) 30538872128.0;
+        String cuitCliente="30538872128";
         int tipoD=80;//80- cuit 96- dni
         int tipoC=1;
         Double montoT=1.0;
@@ -51,6 +51,10 @@ public class FEAFIPDemo {
         detalle.setCantidad(1.0);
         detalle.setPrecioUnitario(1.0);
         lstDetalle.add(detalle);
+        double cuit=2022905383.0;
+        //String cuitClien=Float.toString((float) 20229053834.0);
+        
+        //System.out.println(Float.toString(cuit)+" convertido: "+cuitClien);
         factu.generar(conexion, condicion, archivoKey, archivoCrt, idCliente, cuitCliente, tipoD, tipoC, montoT,montoB,montoI,ptoVta, cuitVendedor,tVta,listadoI,listadoT,razon,direc,condicionIvaC,lstDetalle);
         /*
         MainFrame mainFrame = new MainFrame();

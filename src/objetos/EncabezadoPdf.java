@@ -15,13 +15,13 @@ public class EncabezadoPdf {
     private final String direccion;
     private final String telefono;
     private final int punto;
-    private final Integer numero;
+    private final double numero;
     private final String cuit;
     private final String ingresosBrutos;
     private final String inicioActividades;
     private final String condicionIva;
 
-    public EncabezadoPdf(int punto, Integer numero) {
+    public EncabezadoPdf(int punto, double numero) {
         this.punto = punto;
         this.numero = numero;
         this.nombreComercio="BAMBUSOFT";
@@ -59,7 +59,7 @@ public class EncabezadoPdf {
         return punto;
     }
 
-    public Integer getNumero() {
+    public double getNumero() {
         return numero;
     }
 

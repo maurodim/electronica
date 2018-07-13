@@ -9,6 +9,7 @@ import feafip.bi.Iwsfev1;
 import feafip.bi.TipoComprobante;
 import interfaces.FacturableE;
 import interfaces.Instalable;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -37,7 +38,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
     private Integer idFactura;
     private Integer idCliente;
     private String fecha;
-    private float customerId;
+    private String customerId;
     private String customerTypeDoc;
     private String tipoComprobante;
     private Double importeTotal;
@@ -130,11 +131,11 @@ public class FacturaElectronica implements FacturableE,Instalable{
         this.fecha = fecha;
     }
 
-    public float getCustomerId() {
+    public String getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(float customerId) {
+    public void setCustomerId(String customerId) {
         this.customerId = customerId;
     }
 
@@ -304,15 +305,17 @@ public class FacturaElectronica implements FacturableE,Instalable{
         String FechaComp = formatter.format(new Date());
          
         Iwsfev1 wsfev1 = ClassFactory.createwsfev1();
-        float cuitV=(float) 20229053834.0;
-        //float cuitC=this.customerId;
+        double cuitV= Double.parseDouble("20229053834");
+        double cuitC=Double.parseDouble(this.customerId);
         int customerTD=Integer.parseInt(this.customerTypeDoc);
         String montoT=String.valueOf(this.importeTotal);
         String montoN=String.valueOf(this.importeNeto);
         String montoI=String.valueOf(this.impuestoLiquido);
         //wsfev1.cuit(20229053834.0);  // Cuit del vendedor
         wsfev1.cuit(cuitV);
-        System.out.println(this.customerId+" convertido: "+Float.valueOf("30538872128").floatValue());
+        //i BigDecimal roundFinalPrice=new BigDecimal(cuitV).setScale(2,BigDecimal.ROUND_HALF_UP);
+        //String cuitClien=roundFinalPrice.toPlainString();
+        
         //JOptionPane.showMessageDialog(null,"Fecha "+FechaComp);
         wsfev1.url(URLWSW);
         System.out.println(URLWSW+" wsaa "+URLWSAA);
@@ -323,7 +326,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
                 nro = wsfev1.sfLastCMP() + 1;
                 wsfev1.reset();
                 if(this.condicionIvaVendedor.equals("2")){
-                    wsfev1.agregaFactura(this.tipoVta,customerTD, this.customerId, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, "", "", "", "PES", 1);
+                    wsfev1.agregaFactura(this.tipoVta,customerTD, cuitC, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, "", "", "", "PES", 1);
                     //wsfev1.agregaFactura(2, 99,0.0, nro, nro, FechaComp, 1.5, 0, 1.5, 0, FechaComp, FechaComp, FechaComp, "PES", 1);
                     
                     
@@ -345,7 +348,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         }
                     }
                 }else{
-                    wsfev1.agregaFactura(this.tipoVta,customerTD, 30538872128.0, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, FechaComp,FechaComp,FechaComp, "PES", 1);
+                    wsfev1.agregaFactura(this.tipoVta,customerTD, cuitC, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, FechaComp,FechaComp,FechaComp, "PES", 1);
                 }
                 if (!wsfev1.autorizar(ptoVta, (TipoComprobante)tipoComp)){
                     JOptionPane.showMessageDialog(null,wsfev1.errorDesc());
@@ -354,8 +357,12 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         JOptionPane.showMessageDialog(null,"Felicitaciones! Si ve este mensaje instalo correctamente FEAFIP. CAE y Vencimiento: " + wsfev1.sfcae(0) + " " + wsfev1.sfVencimiento(0)+" numero comprobante "+nro);
                         this.cae=wsfev1.sfcae(0);
                         this.caeVto=wsfev1.sfVencimiento(0);
-                        this.afipPlastId=String.valueOf(nro);
-                        this.afipPlastCbte=String.valueOf(nro);
+                        String num=String.valueOf(nro);
+                        int nume=num.length();
+                        nume=nume-2;
+                        num=num.substring(0,nume);
+                        this.afipPlastId=num;
+                        this.afipPlastCbte=num;
                         this.tipoComprobante=String.valueOf((TipoComprobante)tipoComp);
                         this.fechaCae=FechaComp;
                         
@@ -366,6 +373,8 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         
                         pdfsJavaGenerador pdf=new pdfsJavaGenerador();
                         pdf.setDoc(this);
+                        pdf.setPunto(this.numeroPuntoDeVenta);
+                        pdf.setNumero(nro);
                         pdf.run();
                         return nro;
                         //return this.guardarEnFiscal();
@@ -980,7 +989,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
     }
 
     @Override
-    public Integer generar(Connection conexion, int Condicion, String archivoKey, String archivoCrt, Integer idCliente, float cuitCliente, int tipoDocumentoCliente, int tipoComprobante, Double montoTotal, Double montoBruto, Double montoIva,int ptoDeVenta,String cuitVendedor,int tipoV,ArrayList lstI,ArrayList lstT,String razonSocial,String direccion,String condicionIvaCliente,ArrayList lstDetalle) {
+    public Integer generar(Connection conexion, int Condicion, String archivoKey, String archivoCrt, Integer idCliente, String cuitCliente, int tipoDocumentoCliente, int tipoComprobante, Double montoTotal, Double montoBruto, Double montoIva,int ptoDeVenta,String cuitVendedor,int tipoV,ArrayList lstI,ArrayList lstT,String razonSocial,String direccion,String condicionIvaCliente,ArrayList lstDetalle) {
         FacturaElectronica fE=new FacturaElectronica();
         fE.listadoIva=new ArrayList();
         fE.listadoTributos=new ArrayList();

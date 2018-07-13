@@ -36,8 +36,16 @@ public class pdfsJavaGenerador {
     private FacturaElectronica doc=new FacturaElectronica();
     private ArrayList lstDetalle;
     private int punto;
-    private Integer numero;
+    private Double numero;
     private EncabezadoClientes cliente;
+
+    public void setPunto(int punto) {
+        this.punto = punto;
+    }
+
+    public void setNumero(Double numero) {
+        this.numero = numero;
+    }
 
     
     
@@ -57,20 +65,25 @@ public class pdfsJavaGenerador {
         Document documento=new Document();
         int i=1;
         String clienteF=doc.getAfipPlastCbte().replace(":","_");
-        String arch="Facturas Electronicas\\"+clienteF+"_factura.pdf";
+        String num=String.valueOf(this.numero);
+            int nume=num.length();
+            nume=nume-2;
+            num=num.substring(0,nume);
+        String arch="Facturas Electronicas\\"+num+"_factura.pdf";
         
         
         File fich=new File(arch);
         while(fich.exists()){
             i++;
-            arch="Facturas Electronicas\\"+clienteF+i+"_factura.pdf";
+            arch="Facturas Electronicas\\"+num+i+"_factura.pdf";
             fich=new File(arch);
         }
         FileOutputStream fichero;
         
         try {
+            
             EncabezadoPdf encabezado=new EncabezadoPdf(this.punto,this.numero);
-            cliente=new EncabezadoClientes(doc.getRazonSocial(),doc.getCondicionIvaCliente(),doc.getDireccionCliente(),doc.getCustomerTypeDoc(),String.valueOf(doc.getCustomerId()));
+            cliente=new EncabezadoClientes(doc.getRazonSocial(),doc.getCondicionIvaCliente(),doc.getDireccionCliente(),doc.getCustomerTypeDoc(),doc.getCustomerId());
             DetalleFacturas saldo=new DetalleFacturas();
             //Facturable cotizable=new DetalleFacturas();
             ArrayList listado=new ArrayList();
@@ -273,7 +286,8 @@ public class pdfsJavaGenerador {
             bf = BaseFont.createFont(BaseFont.HELVETICA_BOLD,BaseFont.CP1252,BaseFont.NOT_EMBEDDED);
             cb.setFontAndSize(bf,9);
             cb.setTextMatrix(360,755);
-            cb.showText("Punto de Venta: 000"+this.punto+" Comp. Nro:"+this.numero);
+            
+            cb.showText("Punto de Venta: 000"+this.punto+" Comp. Nro:"+num);
             //bf = BaseFont.createFont(BaseFont.COURIER,BaseFont.CP1252,BaseFont.NOT_EMBEDDED);
             cb.setFontAndSize(bf,9);
             cb.setTextMatrix(360,745);
