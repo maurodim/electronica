@@ -25,7 +25,7 @@ public class FEAFIPDemo {
         Connection conexion=null;
         int condicion=2;
         String archivoKey="clave.key";
-        String archivoCrt="sistema.crt";
+        String archivoCrt="certificado.crt";
         int idCliente=1;
         String cuitCliente="30538872128";
         int tipoD=80;//80- cuit 96- dni
@@ -40,7 +40,10 @@ public class FEAFIPDemo {
         ArrayList listadoT=new ArrayList();
         listadoI=null;
         listadoT=null;
-        factu.generar(conexion, condicion, archivoKey, archivoCrt, idCliente, cuitCliente, tipoD, tipoC, montoT,montoB,montoI,ptoVta, cuitVendedor,tVta,listadoI,listadoT);
+        String razon="CONFEDERACION ARGENTINA DE LA MED EMPRESA (CAME)";
+        String direc="L. N. ALEM 452 - 1003 CABA";
+        String condicionIvaC="EXENTO";
+        factu.generar(conexion, condicion, archivoKey, archivoCrt, idCliente, cuitCliente, tipoD, tipoC, montoT,montoB,montoI,ptoVta, cuitVendedor,tVta,listadoI,listadoT,razon,direc,condicionIvaC);
         /*
         MainFrame mainFrame = new MainFrame();
         mainFrame.setVisible(true);

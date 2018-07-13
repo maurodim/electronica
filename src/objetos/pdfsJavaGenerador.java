@@ -37,6 +37,8 @@ public class pdfsJavaGenerador {
     private ArrayList lstDetalle;
     private int punto;
     private Integer numero;
+    private EncabezadoClientes cliente;
+
     
     
     public void setLstDetalle(ArrayList lstDetalle) {
@@ -68,6 +70,7 @@ public class pdfsJavaGenerador {
         
         try {
             EncabezadoPdf encabezado=new EncabezadoPdf(this.punto,this.numero);
+            cliente=new EncabezadoClientes(doc.getRazonSocial(),doc.getCondicionIvaCliente(),doc.getDireccionCliente(),doc.getCustomerTypeDoc(),doc.getCustomerId());
             DetalleFacturas saldo=new DetalleFacturas();
             //Facturable cotizable=new DetalleFacturas();
             ArrayList listado=new ArrayList();
@@ -468,14 +471,11 @@ public class pdfsJavaGenerador {
                 items=0;
             }
             
-            factura.setTotal(totalS);
+            //factura.setTotal(totalS);
             
-            String totalF="";
-            if(factura.getTotal()!=null){
-                totalF=Numeros.ConvertirNumero(factura.getTotal());
-            }else{
-                totalF="0.00";
-            }
+           
+             String totalF=Numeros.ConvertirNumero(doc.getImporteTotal());
+            
             //String letras=NumberToLetterConverter.convertNumberToLetter(factura.getTotal());
             bf = BaseFont.createFont(BaseFont.HELVETICA_BOLD,BaseFont.CP1252,BaseFont.NOT_EMBEDDED);
             cb.setFontAndSize(bf,8);
@@ -513,8 +513,8 @@ public class pdfsJavaGenerador {
             
                 
                // cb.setTextMatrix(40,renglon);
-            Double sub=factura.getTotal() / 1.21;
-            Double iva=factura.getTotal() - sub;
+            Double sub=doc.getImporteNeto();
+            Double iva=doc.getImpuestoLiquido();
             cb.showText("$ "+Numeros.ConvertirNumero(sub));
             renglon=renglon - 10;
             cb.setTextMatrix(380,renglon);
@@ -605,7 +605,7 @@ public class pdfsJavaGenerador {
                 documento.add(imagen);
                 Barcode128 codeEAN=new Barcode128();
                 codeEAN.setCodeType(Barcode.CODE128);
-                String codigoB=Propiedades.getCUIT()+comF+doc.getCae()+doc.getCaeVto()+"3";
+                String codigoB=doc.getCustomerId()+comF+doc.getCae()+doc.getCaeVto()+"3";
                 codeEAN.setCode(codigoB);
                 //codeEAN.setSize(5);
                 Image img=codeEAN.createImageWithBarcode(cb, Color.BLACK, Color.black);

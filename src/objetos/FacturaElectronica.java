@@ -55,6 +55,27 @@ public class FacturaElectronica implements FacturableE,Instalable{
     private int tipoVta;
     private ArrayList listadoIva;
     private ArrayList listadoTributos;
+    private String razonSocial;
+    private String direccionCliente;
+    private String condicionIvaCliente;
+
+    public String getCondicionIvaCliente() {
+        return condicionIvaCliente;
+    }
+    
+
+    public int getNumeroPuntoDeVenta() {
+        return numeroPuntoDeVenta;
+    }
+
+    public String getRazonSocial() {
+        return razonSocial;
+    }
+
+    public String getDireccionCliente() {
+        return direccionCliente;
+    }
+    
     
     
     
@@ -321,7 +342,9 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         this.afipPlastCbte=String.valueOf(nro);
                         //ACA DEBERÍA PASAR LOS VALORES A PDF PARA QUE SE GENERE LA FACTURA
                         
-                        
+                        pdfsJavaGenerador pdf=new pdfsJavaGenerador();
+                        pdf.setDoc(this);
+                        pdf.run();
                         return nro;
                         //return this.guardarEnFiscal();
                     } else {
@@ -935,7 +958,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
     }
 
     @Override
-    public Integer generar(Connection conexion, int Condicion, String archivoKey, String archivoCrt, Integer idCliente, String cuitCliente, int tipoDocumentoCliente, int tipoComprobante, Double montoTotal, Double montoBruto, Double montoIva,int ptoDeVenta,String cuitVendedor,int tipoV,ArrayList lstI,ArrayList lstT) {
+    public Integer generar(Connection conexion, int Condicion, String archivoKey, String archivoCrt, Integer idCliente, String cuitCliente, int tipoDocumentoCliente, int tipoComprobante, Double montoTotal, Double montoBruto, Double montoIva,int ptoDeVenta,String cuitVendedor,int tipoV,ArrayList lstI,ArrayList lstT,String razonSocial,String direccion,String condicionIvaCliente) {
         FacturaElectronica fE=new FacturaElectronica();
         fE.listadoIva=new ArrayList();
         fE.listadoTributos=new ArrayList();
@@ -955,24 +978,28 @@ public class FacturaElectronica implements FacturableE,Instalable{
         fE.tipoVta=tipoV;
         fE.listadoIva=lstI;
         fE.listadoTributos=lstT;
-        if(this.condicionIvaVendedor.equals("2")){
+        fE.razonSocial=razonSocial;
+        fE.direccionCliente=direccion;
+        fE.condicionIvaCliente=condicionIvaCliente;
+        
+        if(fE.condicionIvaVendedor.equals("2")){
             
             
-            if(this.tipoCompro==1)tipoComp=TipoComprobante.tcFacturaB;//factura B a consumidor final
-            if(this.tipoCompro==2)tipoComp=TipoComprobante.tcFacturaA;//1 FACTURA A 
-            if(this.tipoCompro==9)tipoComp=TipoComprobante.tcNotaDebitoA;//2
-            if(this.tipoCompro==10)tipoComp=TipoComprobante.tcNotaCreditoA;//3 NOTA DE CREDITO A
-            if(this.tipoCompro==11)tipoComp=TipoComprobante.tcNotaDebitoB;
-            if(this.tipoCompro==12)tipoComp=TipoComprobante.tcNotaCreditoB;//tipComprobante=8;
-            if(this.tipoCompro==8)tipoComp=TipoComprobante.tcFacturaB;//NTA DE CREDITO B A CONS FINAL y exento
-            if(this.tipoCompro==3)tipoComp=TipoComprobante.tcFacturaB;// factura B A EXENTO
+            if(fE.tipoCompro==1)tipoComp=TipoComprobante.tcFacturaB;//factura B a consumidor final
+            if(fE.tipoCompro==2)tipoComp=TipoComprobante.tcFacturaA;//1 FACTURA A 
+            if(fE.tipoCompro==9)tipoComp=TipoComprobante.tcNotaDebitoA;//2
+            if(fE.tipoCompro==10)tipoComp=TipoComprobante.tcNotaCreditoA;//3 NOTA DE CREDITO A
+            if(fE.tipoCompro==11)tipoComp=TipoComprobante.tcNotaDebitoB;
+            if(fE.tipoCompro==12)tipoComp=TipoComprobante.tcNotaCreditoB;//tipComprobante=8;
+            if(fE.tipoCompro==8)tipoComp=TipoComprobante.tcFacturaB;//NTA DE CREDITO B A CONS FINAL y exento
+            if(fE.tipoCompro==3)tipoComp=TipoComprobante.tcFacturaB;// factura B A EXENTO
         }else{
-            if(this.tipoCompro==1)tipoComp=TipoComprobante.tcFacturaC;
-            if(this.tipoCompro==2)tipoComp=TipoComprobante.tcFacturaC;//1
-            if(this.tipoCompro==9)tipoComp=TipoComprobante.tcNotaDebitoC;//2
-            if(this.tipoCompro==10)tipoComp=TipoComprobante.tcNotaCreditoC;//3
-            if(this.tipoCompro==11)tipoComp=TipoComprobante.tcNotaDebitoC;
-            if(this.tipoCompro==12)tipoComp=TipoComprobante.tcNotaCreditoC;
+            if(fE.tipoCompro==1)tipoComp=TipoComprobante.tcFacturaC;
+            if(fE.tipoCompro==2)tipoComp=TipoComprobante.tcFacturaC;//1
+            if(fE.tipoCompro==9)tipoComp=TipoComprobante.tcNotaDebitoC;//2
+            if(fE.tipoCompro==10)tipoComp=TipoComprobante.tcNotaCreditoC;//3
+            if(fE.tipoCompro==11)tipoComp=TipoComprobante.tcNotaDebitoC;
+            if(fE.tipoCompro==12)tipoComp=TipoComprobante.tcNotaCreditoC;
         }
         
         fE.leer();
