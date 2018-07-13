@@ -320,6 +320,8 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         this.afipPlastId=String.valueOf(nro);
                         this.afipPlastCbte=String.valueOf(nro);
                         //ACA DEBERÍA PASAR LOS VALORES A PDF PARA QUE SE GENERE LA FACTURA
+                        
+                        
                         return nro;
                         //return this.guardarEnFiscal();
                     } else {

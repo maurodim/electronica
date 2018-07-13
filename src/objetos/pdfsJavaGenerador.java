@@ -16,6 +16,7 @@ import com.lowagie.text.pdf.Barcode128;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfWriter;
+import conversiones.Numeros;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,7 +35,10 @@ import java.util.logging.Logger;
 public class pdfsJavaGenerador {
     private FacturaElectronica doc=new FacturaElectronica();
     private ArrayList lstDetalle;
-
+    private int punto;
+    private Integer numero;
+    
+    
     public void setLstDetalle(ArrayList lstDetalle) {
         this.lstDetalle=new ArrayList();
         this.lstDetalle = lstDetalle;
@@ -63,10 +67,12 @@ public class pdfsJavaGenerador {
         FileOutputStream fichero;
         
         try {
+            EncabezadoPdf encabezado=new EncabezadoPdf(this.punto,this.numero);
             DetalleFacturas saldo=new DetalleFacturas();
-            Facturable cotizable=new DetalleFacturas();
+            //Facturable cotizable=new DetalleFacturas();
             ArrayList listado=new ArrayList();
-            listado=cotizable.cargarDetallefactura(doc.getIdFactura());
+            //listado=cotizable.cargarDetallefactura(doc.getIdFactura());
+            listado=this.lstDetalle;
             fichero=new FileOutputStream(arch);
             PdfWriter writer=PdfWriter.getInstance(documento, fichero);
             documento.open();
@@ -128,23 +134,23 @@ public class pdfsJavaGenerador {
             if(aa==2)cb.showText("TRIPLICADO");
             cb.setFontAndSize(bf,21);
             cb.setTextMatrix(25,770);
-            cb.showText(Propiedades.getNOMBRECOMERCIO());
+            cb.showText(encabezado.getNombreComercio());
             //cb.setTextMatrix(90,750);
             //cb.showText("ANTONIO");
             //cb.showText("eR&Re");
             //cb.add(imagen);
             cb.setFontAndSize(bf,9);
             cb.setTextMatrix(25,740);
-            cb.showText("Razón Social: "+Propiedades.getRAZONSOCIAL());
+            cb.showText("Razón Social: "+encabezado.getRazonSocial());
             cb.setTextMatrix(25, 730);
-            cb.showText("Domicilio Comercial: "+Propiedades.getDIRECCION());
+            cb.showText("Domicilio Comercial: "+encabezado.getDireccion());
             //cb.showText("PAPELES");
             //bf = BaseFont.createFont(BaseFont.HELVETICA,BaseFont.CP1252,BaseFont.NOT_EMBEDDED);
             //cb.setFontAndSize(bf,10);
             cb.setTextMatrix(25,720);
-            cb.showText("Telefono: "+Propiedades.getTELEFONO());
+            cb.showText("Telefono: "+encabezado.getTelefono());
             cb.setTextMatrix(25,710);
-            cb.showText("Condición frente la IVA: Responsable Inscripto");
+            cb.showText("Condición frente la IVA: "+encabezado.getCondicionIva());
             
             //cb.showText("de Rivadeneira Enrique y Rivadeneira Jorge S.H.");
             //bf = BaseFont.createFont(BaseFont.HELVETICA,BaseFont.CP1252,BaseFont.NOT_EMBEDDED);
@@ -256,17 +262,17 @@ public class pdfsJavaGenerador {
             bf = BaseFont.createFont(BaseFont.HELVETICA_BOLD,BaseFont.CP1252,BaseFont.NOT_EMBEDDED);
             cb.setFontAndSize(bf,9);
             cb.setTextMatrix(360,755);
-            cb.showText("Punto de Venta: 000"+Propiedades.getPTO()+" Comp. Nro:"+numero);
+            cb.showText("Punto de Venta: 000"+this.punto+" Comp. Nro:"+this.numero);
             //bf = BaseFont.createFont(BaseFont.COURIER,BaseFont.CP1252,BaseFont.NOT_EMBEDDED);
             cb.setFontAndSize(bf,9);
             cb.setTextMatrix(360,745);
             cb.showText("Fecha de emisión: "+doc.getFechaCae());
             cb.setTextMatrix(360,730);
-            cb.showText("CUIT: "+Propiedades.getCUIT());
+            cb.showText("CUIT: "+encabezado.getCuit());
             cb.setTextMatrix(360,720);
-            cb.showText("Ing. Brutos: "+Propiedades.getINGBRUTOS());
+            cb.showText("Ing. Brutos: "+encabezado.getIngresosBrutos());
             cb.setTextMatrix(360,710);
-            cb.showText("Inicio Activ.: "+Propiedades.getINICIOACT());
+            cb.showText("Inicio Activ.: "+encabezado.getInicioActividades());
             //cb.setTextMatrix(380,740);
             //cb.showText("Fecha "+doc.getFechaCae());
             bf = BaseFont.createFont(BaseFont.HELVETICA,BaseFont.CP1252,BaseFont.NOT_EMBEDDED);
