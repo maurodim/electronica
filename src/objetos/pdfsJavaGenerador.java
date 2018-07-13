@@ -6,9 +6,7 @@
 package objetos;
 
 
-import Clientes.Objetos.ClientesTango;
-import Configuracion.Propiedades;
-import Conversores.Numeros;
+
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
@@ -35,10 +33,11 @@ import java.util.logging.Logger;
  */
 public class pdfsJavaGenerador {
     private FacturaElectronica doc=new FacturaElectronica();
-    private ClientesTango cliente=new ClientesTango();
+    private ArrayList lstDetalle;
 
-    public void setCliente(ClientesTango cliente) {
-        this.cliente = cliente;
+    public void setLstDetalle(ArrayList lstDetalle) {
+        this.lstDetalle=new ArrayList();
+        this.lstDetalle = lstDetalle;
     }
     
     
@@ -62,9 +61,7 @@ public class pdfsJavaGenerador {
             fich=new File(arch);
         }
         FileOutputStream fichero;
-        Facturas factura=new Facturas();
-        Facturable fac=new Facturas();
-        factura=(Facturas)fac.cargarIdFactura(doc.getIdFactura());
+        
         try {
             DetalleFacturas saldo=new DetalleFacturas();
             Facturable cotizable=new DetalleFacturas();

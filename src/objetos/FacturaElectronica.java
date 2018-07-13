@@ -8,36 +8,14 @@ import feafip.bi.Iwsfev1;
 import feafip.bi.TipoComprobante;
 import interfaces.FacturableE;
 import interfaces.Instalable;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.StringReader;
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
-import java.net.URL;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 
 
@@ -61,9 +39,9 @@ public class FacturaElectronica implements FacturableE,Instalable{
     private String customerId;
     private String customerTypeDoc;
     private String tipoComprobante;
-    private String importeTotal;
-    private String importeNeto;
-    private String impuestoLiquido;
+    private Double importeTotal;
+    private Double importeNeto;
+    private Double impuestoLiquido;
     private String condVta;
     private Integer estado;
     private Connection conexion;
@@ -74,6 +52,9 @@ public class FacturaElectronica implements FacturableE,Instalable{
     private int tipoCompro;
     private TipoComprobante tipoComp;
     private String cuitVendedor;
+    private int tipoVta;
+    private ArrayList listadoIva;
+    private ArrayList listadoTributos;
     
     
     
@@ -145,27 +126,27 @@ public class FacturaElectronica implements FacturableE,Instalable{
         this.tipoComprobante = tipoComprobante;
     }
 
-    public String getImporteTotal() {
+    public Double getImporteTotal() {
         return importeTotal;
     }
 
-    public void setImporteTotal(String importeTotal) {
+    public void setImporteTotal(Double importeTotal) {
         this.importeTotal = importeTotal;
     }
 
-    public String getImporteNeto() {
+    public Double getImporteNeto() {
         return importeNeto;
     }
 
-    public void setImporteNeto(String importeNeto) {
+    public void setImporteNeto(Double importeNeto) {
         this.importeNeto = importeNeto;
     }
 
-    public String getImpuestoLiquido() {
+    public Double getImpuestoLiquido() {
         return impuestoLiquido;
     }
 
-    public void setImpuestoLiquido(String impuestoLiquido) {
+    public void setImpuestoLiquido(Double impuestoLiquido) {
         this.impuestoLiquido = impuestoLiquido;
     }
     
@@ -255,7 +236,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
     
     private Integer guardarEnFiscal(){
         String fecha=Numeros.ConvertirFechaFiscal();
-               
+               /*
                String tipo=String.valueOf(comp.getTipoComprobanteFiscal());
                String numero=String.valueOf(numeroComprobante);
                comp.setMontoBruto(comp.getMontoTotal() / 1.21);
@@ -272,6 +253,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
                sql="insert into fiscal (fecha,tipo,numero,gravado,impuesto,total,idcliente,tipoClienteId,razon,cuit) values (lpad("+fecha+",8,'0'),'"+tipo+"','"+numero+"',"+comp.getMontoBruto()+","+comp.getMontoIva()+","+comp.getMontoTotal()+","+comp.getCliente().getCodigoId()+","+tipoClienteId+",'"+razonS+"','"+cuit+"')";
                System.out.println("fiscal: "+sql);
                tra.guardarRegistro(sql);
+        */
                return 0;
     }
     private Object leer(){
@@ -295,6 +277,11 @@ public class FacturaElectronica implements FacturableE,Instalable{
          
         Iwsfev1 wsfev1 = ClassFactory.createwsfev1();
         float cuitV=Float.parseFloat(this.cuitVendedor+".0");
+        float cuitC=Float.parseFloat(this.customerId+".0");
+        int customerTD=Integer.parseInt(this.customerTypeDoc);
+        String montoT=String.valueOf(this.importeTotal);
+        String montoN=String.valueOf(this.importeNeto);
+        String montoI=String.valueOf(this.impuestoLiquido);
         //wsfev1.cuit(20229053834.0);  // Cuit del vendedor
         wsfev1.cuit(cuitV); 
         wsfev1.url(URLWSW);
@@ -304,14 +291,37 @@ public class FacturaElectronica implements FacturableE,Instalable{
             } else {
                 nro = wsfev1.sfLastCMP() + 1;
                 wsfev1.reset();
-                wsfev1.agregaFactura(2, 80, 30538872128.0, nro, nro, FechaComp, 1.5, 0, 1.5, 0, "", "", "", "PES", 1);
-                //wsfev1.agregaFactura(2, 99,0.0, nro, nro, FechaComp, 1.5, 0, 1.5, 0, FechaComp, FechaComp, FechaComp, "PES", 1);
-                wsfev1.agregaIVA(1, 0,0); // Ver Excel de referencias de codigos AFIP
+                if(this.condicionIvaVendedor.equals("2")){
+                    wsfev1.agregaFactura(this.tipoVta,customerTD, cuitC, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, "", "", "", "PES", 1);
+                    //wsfev1.agregaFactura(2, 99,0.0, nro, nro, FechaComp, 1.5, 0, 1.5, 0, FechaComp, FechaComp, FechaComp, "PES", 1);
+                    Iterator itI=this.listadoIva.listIterator();
+                    Iterator itT=this.listadoTributos.listIterator();
+                    TiposIva tipoI;
+                    Tributos tributos;
+                    while(itI.hasNext()){
+                        tipoI=(TiposIva) itI.next();
+                        wsfev1.agregaIVA(tipoI.getId(),tipoI.getBaseImponible(),tipoI.getImporte()); // Ver Excel de referencias de codigos AFIP
+                        //wsfev1.agregaIVA(1, 0,0); // Ver Excel de referencias de codigos AFIP
+                    }
+                    while(itT.hasNext()){
+                        tributos=(Tributos) itT.next();
+                        wsfev1.agregaTributo(tributos.getId(),tributos.getDescripcion(),tributos.getBaseImponible(),tributos.getAlicuota(),tributos.getImporte());
+                    }
+                }else{
+                    wsfev1.agregaFactura(this.tipoVta,customerTD, cuitC, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, FechaComp,FechaComp,FechaComp, "PES", 1);
+                }
                 if (!wsfev1.autorizar(ptoVta, (TipoComprobante)tipoComp)){
                     JOptionPane.showMessageDialog(null,wsfev1.errorDesc());
                 } else {
                     if (wsfev1.sfResultado(0).equals("A")) {
                         JOptionPane.showMessageDialog(null,"Felicitaciones! Si ve este mensaje instalo correctamente FEAFIP. CAE y Vencimiento: " + wsfev1.sfcae(0) + " " + wsfev1.sfVencimiento(0)+" numero comprobante "+nro);
+                        this.cae=wsfev1.sfcae(0);
+                        this.caeVto=wsfev1.sfVencimiento(0);
+                        this.afipPlastId=String.valueOf(nro);
+                        this.afipPlastCbte=String.valueOf(nro);
+                        //ACA DEBERÍA PASAR LOS VALORES A PDF PARA QUE SE GENERE LA FACTURA
+                        return nro;
+                        //return this.guardarEnFiscal();
                     } else {
                         JOptionPane.showMessageDialog(null,wsfev1.autorizarRespuestaObs(0));
                     }
@@ -329,7 +339,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
         
         
         
-        
+        /*
         Comprobantes compro=new Comprobantes();
         compro=(Comprobantes)comp;
         FacturaElectronica fE=new FacturaElectronica();
@@ -556,8 +566,8 @@ public class FacturaElectronica implements FacturableE,Instalable{
             fE=(FacturaElectronica) comC.leer(comp);
             
         }
-        
-      return fE;
+        */
+      return this;
     }
 
     @Override
@@ -567,11 +577,13 @@ public class FacturaElectronica implements FacturableE,Instalable{
 
     @Override
     public Integer guardar(Object Fe) {
+        Integer id=0;
+        /*
         Transaccionable tra=new Conecciones();
         FacturaElectronica ffE=new FacturaElectronica();
         ffE=(FacturaElectronica)Fe;
         Integer estado=0;
-        Integer id=0;
+        //Integer id=0;
         estado=ffE.getEstado();
         //if(ffE.getRespuesta().equals("OK"))estado=1;
         String sql="insert into facturaelectronica (cae,cae_vto,fecha_cae,afipqty,afipplastid,afipplastcbte,idfactura,idcliente,estado,customerid,customertypedoc,tipo_comprobante,importe_total,importe_neto,impto_liq) values ('"+ffE.getCae()+"','"+ffE.getCaeVto()+"','"+ffE.getFechaCae()+"','"+ffE.getAfipQty()+"','"+ffE.getAfipPlastId()+"','"+ffE.getAfipPlastCbte()+"',"+ffE.getIdFactura()+","+ffE.getIdCliente()+","+estado+",'"+ffE.getCustomerId()+"','"+ffE.getCustomerTypeDoc()+"','"+ffE.getTipoComprobante()+"','"+ffE.getImporteTotal()+"','"+ffE.getImporteNeto()+"','"+ffE.getImpuestoLiquido()+"')";
@@ -586,22 +598,27 @@ public class FacturaElectronica implements FacturableE,Instalable{
         } catch (SQLException ex) {
             Logger.getLogger(FacturaElectronica.class.getName()).log(Level.SEVERE, null, ex);
         }
-                return id;
+        */        
+        return id;
     }
 
     @Override
     public Object modificar(Object Fe) {
         FacturaElectronica fE=new FacturaElectronica();
+        /*
         fE=(FacturaElectronica)Fe;
         String sql="update facturaelectronica set cae='"+fE.getCae()+"',cae_vto='"+fE.getCaeVto()+"',fecha_cae='"+fE.getFechaCae()+"',afipqty='"+fE.getAfipQty()+"',afipplastid='"+fE.getAfipPlastId()+"',afipplastcbte='"+fE.getAfipPlastCbte()+"', estado=1 where id="+fE.getId();
         Transaccionable tra=new Conecciones();
         tra.guardarRegistro(sql);
+        */
         return fE;
     }
 
     @Override
     public ArrayList listarPorEstado(Integer estado) {
         ArrayList listado=new ArrayList();
+        
+        /*
         String sql="select * from facturaelectronica order by id desc";
         Transaccionable tra=new Conecciones();
         ResultSet rs=tra.leerConjuntoDeRegistros(sql);
@@ -638,7 +655,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
         } catch (SQLException ex) {
             Logger.getLogger(FacturaElectronica.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        */
         return listado;
     }
 
@@ -649,7 +666,9 @@ public class FacturaElectronica implements FacturableE,Instalable{
 
     @Override
     public DefaultTableModel mostrarListado(ArrayList listadoC) {
-        MiModeloTablaArticulos listado=new MiModeloTablaArticulos();
+        DefaultTableModel listado=new DefaultTableModel();
+        
+        /*
         FacturaElectronica cotizacion;
         ClientesTango cliente;
         Facturar bus=new ClientesTango();
@@ -675,14 +694,16 @@ public class FacturaElectronica implements FacturableE,Instalable{
             fila[4]=cotizacion.getAfipPlastId();
             listado.addRow(fila);
         }
-        
+        */
         return listado;
     }
 
     @Override
     public Object reEnviar(Object fe) {
         FacturaElectronica fE=new FacturaElectronica();
-            fE=(FacturaElectronica)fe;
+        
+        /*
+        fE=(FacturaElectronica)fe;
         try {
             
             URL url = new URL("https://tufacturaelectronica.net/api/v1/RETRIEVE");
@@ -856,6 +877,8 @@ public class FacturaElectronica implements FacturableE,Instalable{
         } catch (IOException ex) {
             Logger.getLogger(FacturaElectronica.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        */
         return fE;
         
     }
@@ -867,6 +890,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
 
     @Override
     public String reimprimir(Object fe) {
+        /*
         FacturaElectronica fE=new FacturaElectronica();
         fE=(FacturaElectronica)fe;
         pdfsJavaGenerador pdf=new pdfsJavaGenerador();
@@ -876,6 +900,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
         pdf.setCliente(cliente);
         pdf.setDoc(fE);
         pdf.run();
+        */
         return null;
         
     }
@@ -888,14 +913,16 @@ public class FacturaElectronica implements FacturableE,Instalable{
     @Override
     public Boolean InstalarTablas() {
         //creacion de tabla facturaelectronica
+        
         Boolean ver=true;
+        /*
         Transaccionable tra=new Conecciones();
         tra.guardarRegistro("CREATE TABLE facturaelectronica (id int(11) NOT NULL,cae varchar (20),cae_vto varchar(8),fecha_cae varchar(20),afipqty varchar(4),afipplastid varchar(20),afipplastcbte varchar(10),idfactura int(11) not null,idcliente int(11) not null,estado int(11) not null default '0',customerid varchar (11),customertypedoc varchar(2),tipo_comprobante varchar(1),importe_total varchar(30),importe_neto varchar(25),impto_liq varchar(25),fecha timestamp not null default current_timestamp)ENGINE=InnoDB DEFAULT CHARSET=utf8"); //(idcliente,total,tipo,idusuario,idpedido,idremito,numerofactura,estado,saldo,subtotal,descuento,porcentajeD)
         tra.guardarRegistro("ALTER TABLE facturaelectronica ADD PRIMARY KEY (id)");
         tra.guardarRegistro("ALTER TABLE facturaelectronica MODIFY id int(11) NOT NULL AUTO_INCREMENT");
         tra.guardarRegistro("alter table facturaelectronica modify tipo_comprobante varchar(2)");
         
-        
+        */
         //String sql="insert into facturaelectronica (cae,cae_vto,fecha_cae,afipqty,afipplastid,afipplastcbte,idfactura,idcliente,estado,customerid,customertypedoc,tipo_comprobante,importe_total,importe_neto,impto_liq) values ('"+ffE.getCae()+"','"+ffE.getCaeVto()+"','"+ffE.getFechaCae()+"','"+ffE.getAfipQty()+"','"+ffE.getAfipPlastId()+"','"+ffE.getAfipPlastCbte()+"',"+ffE.getIdFactura()+","+ffE.getIdCliente()+","+estado+",'"+ffE.getCustomerId()+"','"+ffE.getCustomerTypeDoc()+"','"+ffE.getTipoComprobante()+"','"+ffE.getImporteTotal()+"','"+ffE.getImporteNeto()+"','"+ffE.getImpuestoLiquido()+"')";
         return ver;
     }
@@ -906,8 +933,10 @@ public class FacturaElectronica implements FacturableE,Instalable{
     }
 
     @Override
-    public Integer generar(Connection conexion, int Condicion, String archivoKey, String archivoCrt, Integer idCliente, String cuitCliente, int tipoDocumentoCliente, int tipoComprobante, Double montoTotal, Double montoBruto, Double montoIva,int ptoDeVenta,String cuitVendedor) {
+    public Integer generar(Connection conexion, int Condicion, String archivoKey, String archivoCrt, Integer idCliente, String cuitCliente, int tipoDocumentoCliente, int tipoComprobante, Double montoTotal, Double montoBruto, Double montoIva,int ptoDeVenta,String cuitVendedor,int tipoV,ArrayList lstI,ArrayList lstT) {
         FacturaElectronica fE=new FacturaElectronica();
+        fE.listadoIva=new ArrayList();
+        fE.listadoTributos=new ArrayList();
         fE.conexion=conexion;
         fE.condicionIvaVendedor=String.valueOf(Condicion);
         fE.archivoKey=archivoKey;
@@ -916,27 +945,32 @@ public class FacturaElectronica implements FacturableE,Instalable{
         fE.customerId=cuitCliente;
         fE.customerTypeDoc=String.valueOf(tipoDocumentoCliente);
         fE.numeroPuntoDeVenta=ptoDeVenta;
-        fE.importeTotal=String.valueOf(montoTotal);
-        fE.importeNeto=String.valueOf(montoBruto);
-        fE.impuestoLiquido=String.valueOf(montoIva);
+        fE.importeTotal=montoTotal;
+        fE.importeNeto=montoBruto;
+        fE.impuestoLiquido=montoIva;
         fE.tipoCompro=tipoComprobante;
         fE.cuitVendedor=cuitVendedor;
+        fE.tipoVta=tipoV;
+        fE.listadoIva=lstI;
+        fE.listadoTributos=lstT;
         if(this.condicionIvaVendedor.equals("2")){
+            
+            
             if(this.tipoCompro==1)tipoComp=TipoComprobante.tcFacturaB;//factura B a consumidor final
-            if(this.tipoCompro==2)tipComprobante=1;//1 FACTURA A 
-            if(this.tipoCompro==9)tipComprobante=2;//2
-            if(this.tipoCompro==10)tipComprobante=3;//3 NOTA DE CREDITO A
-            if(this.tipoCompro==11)tipComprobante=7;
-            if(this.tipoCompro==12)tipComprobante=8;
-            if(this.tipoCompro==8)tipComprobante=8;//NTA DE CREDITO B A CONS FINAL y exento
-            if(this.tipoCompro==3)tipComprobante=6;// factura B A EXENTO
+            if(this.tipoCompro==2)tipoComp=TipoComprobante.tcFacturaA;//1 FACTURA A 
+            if(this.tipoCompro==9)tipoComp=TipoComprobante.tcNotaDebitoA;//2
+            if(this.tipoCompro==10)tipoComp=TipoComprobante.tcNotaCreditoA;//3 NOTA DE CREDITO A
+            if(this.tipoCompro==11)tipoComp=TipoComprobante.tcNotaDebitoB;
+            if(this.tipoCompro==12)tipoComp=TipoComprobante.tcNotaCreditoB;//tipComprobante=8;
+            if(this.tipoCompro==8)tipoComp=TipoComprobante.tcFacturaB;//NTA DE CREDITO B A CONS FINAL y exento
+            if(this.tipoCompro==3)tipoComp=TipoComprobante.tcFacturaB;// factura B A EXENTO
         }else{
-            if(this.tipoCompro==1)tipComprobante=11;
-            if(this.tipoCompro==2)tipComprobante=11;//1
-            if(this.tipoCompro==9)tipComprobante=12;//2
-            if(this.tipoCompro==10)tipComprobante=13;//3
-            if(this.tipoCompro==11)tipComprobante=12;
-            if(this.tipoCompro==12)tipComprobante=13;
+            if(this.tipoCompro==1)tipoComp=TipoComprobante.tcFacturaC;
+            if(this.tipoCompro==2)tipoComp=TipoComprobante.tcFacturaC;//1
+            if(this.tipoCompro==9)tipoComp=TipoComprobante.tcNotaDebitoC;//2
+            if(this.tipoCompro==10)tipoComp=TipoComprobante.tcNotaCreditoC;//3
+            if(this.tipoCompro==11)tipoComp=TipoComprobante.tcNotaDebitoC;
+            if(this.tipoCompro==12)tipoComp=TipoComprobante.tcNotaCreditoC;
         }
         
         fE.leer();
