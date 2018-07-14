@@ -286,20 +286,19 @@ public class FacturaElectronica implements FacturableE,Instalable{
         String fecha=Numeros.ConvertirFechaFiscal();
                Transaccionable tra=new Conecciones();
                
-               String tipo=String.valueOf(comp.getTipoComprobanteFiscal());
-               String numero=String.valueOf(numeroComprobante);
-               comp.setMontoBruto(comp.getMontoTotal() / 1.21);
-               comp.setMontoIva(comp.getMontoTotal() - comp.getMontoBruto());
+               String tipo=String.valueOf(this.numeroTipoComprobante);
+               String numero=String.valueOf(this.afipPlastId);
+               
                int tipoClienteId=0;
-               if(comp.getTipoComprobante()==11){
+               if(this.numeroTipoComprobante==11){
                    tipoClienteId=99;
                }else{
                    tipoClienteId=80;
                }
-               String razonS=comp.getCliente().getRazonSocial();
-               String cuit=comp.getCliente().getNumeroDeCuit();
+               String razonS=this.razonSocial;
+               String cuit=this.customerId;
                if(cuit.equals("1"))cuit="0";
-               sql="insert into fiscal (fecha,tipo,numero,gravado,impuesto,total,idcliente,tipoClienteId,razon,cuit) values (lpad("+fecha+",8,'0'),'"+tipo+"','"+numero+"',"+comp.getMontoBruto()+","+comp.getMontoIva()+","+comp.getMontoTotal()+","+comp.getCliente().getCodigoId()+","+tipoClienteId+",'"+razonS+"','"+cuit+"')";
+               String sql="insert into fiscal (fecha,tipo,numero,gravado,impuesto,total,idcliente,tipoClienteId,razon,cuit) values (lpad("+fecha+",8,'0'),'"+tipo+"','"+numero+"',"+this.importeNeto+","+this.impuestoLiquido+","+this.importeTotal+","+this.idCliente+","+tipoClienteId+",'"+razonS+"','"+cuit+"')";
                System.out.println("fiscal: "+sql);
                tra.guardarRegistro(sql);
         
