@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import objetos.DetalleFacturas;
 import objetos.FacturaElectronica;
+import objetos.GenerarQr;
 
 /**
  *
@@ -30,7 +31,7 @@ public class FEAFIPDemo {
         int idCliente=1;
         String cuitCliente="30538872128";
         int tipoD=80;//80- cuit 96- dni
-        int tipoC=1;
+        int tipoC=12;
         Double montoT=1.0;
         Double montoB=1.0;
         Double montoI=0.0;
@@ -53,7 +54,7 @@ public class FEAFIPDemo {
         lstDetalle.add(detalle);
         double cuit=2022905383.0;
         //String cuitClien=Float.toString((float) 20229053834.0);
-        
+        //GenerarQr qr=new GenerarQr(condicion+idCliente+cuitCliente+tipoD+tipoC+montoT+montoB+montoI+ptoVta+cuitVendedor+tVta+razon+direc+condicionIvaC);
         //System.out.println(Float.toString(cuit)+" convertido: "+cuitClien);
         factu.generar(conexion, condicion, archivoKey, archivoCrt, idCliente, cuitCliente, tipoD, tipoC, montoT,montoB,montoI,ptoVta, cuitVendedor,tVta,listadoI,listadoT,razon,direc,condicionIvaC,lstDetalle);
         /*

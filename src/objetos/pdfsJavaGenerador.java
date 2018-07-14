@@ -69,13 +69,13 @@ public class pdfsJavaGenerador {
             int nume=num.length();
             nume=nume-2;
             num=num.substring(0,nume);
-        String arch="Facturas Electronicas\\"+num+"_factura.pdf";
+        String arch="Facturas Electronicas\\"+num+"_"+doc.getDescripcionTipoComprobante()+".pdf";
         
         
         File fich=new File(arch);
         while(fich.exists()){
             i++;
-            arch="Facturas Electronicas\\"+num+i+"_factura.pdf";
+            arch="Facturas Electronicas\\"+num+i+"_"+doc.getDescripcionTipoComprobante()+".pdf";
             fich=new File(arch);
         }
         FileOutputStream fichero;
@@ -620,6 +620,11 @@ public class pdfsJavaGenerador {
             cb.setTextMatrix(380,renglon);
             cb.showText(vencimiento1);
             cb.setTextMatrix(20,renglon);
+            Image imagen1= Image.getInstance(doc.getNombreQr());
+                //imagen.scaleAbsolute(84, 410);
+                imagen1.setAbsolutePosition(20,180);
+                documento.add(imagen1);
+            
             renglon=renglon - 50;
              Image imagen= Image.getInstance("imagenes/afip.JPG");
                 //imagen.scaleAbsolute(84, 410);

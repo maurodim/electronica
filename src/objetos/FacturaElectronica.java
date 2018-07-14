@@ -2,6 +2,7 @@ package objetos;
 
 
 
+import Configuracion.Propiedades;
 import conversiones.Numeros;
 import feafip.bi.ClassFactory;
 import feafip.bi.IContribuyente;
@@ -9,6 +10,7 @@ import feafip.bi.Iwsfev1;
 import feafip.bi.TipoComprobante;
 import interfaces.FacturableE;
 import interfaces.Instalable;
+import interfaces.Transaccionable;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.text.Format;
@@ -61,6 +63,23 @@ public class FacturaElectronica implements FacturableE,Instalable{
     private String direccionCliente;
     private String condicionIvaCliente;
     private ArrayList listadoDetalle;
+    private int numeroTipoComprobante;
+    private String descripcionTipoComprobante;
+    private String nombreQr;
+
+    public String getNombreQr() {
+        return nombreQr;
+    }
+    
+
+    public int getNumeroTipoComprobante() {
+        return numeroTipoComprobante;
+    }
+
+    public String getDescripcionTipoComprobante() {
+        return descripcionTipoComprobante;
+    }
+    
 
     public ArrayList getListadoDetalle() {
         return listadoDetalle;
@@ -265,6 +284,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
     
     private Integer guardarEnFiscal(){
         String fecha=Numeros.ConvertirFechaFiscal();
+               Transaccionable tra=new Conecciones();
                /*
                String tipo=String.valueOf(comp.getTipoComprobanteFiscal());
                String numero=String.valueOf(numeroComprobante);
@@ -370,7 +390,9 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         //System.out.println(iContribuyente.condicionIVADesc()+" numero iva "+iContribuyente.condicionIVA().comEnumValue());
                         this.estado=1;
                         //ACA DEBERÍA PASAR LOS VALORES A PDF PARA QUE SE GENERE LA FACTURA
-                        
+                        String dato="Vendedor: "+this.cuitVendedor+" customerId:"+this.customerId+"cae:"+this.cae+"vto:"+this.caeVto+"monto:"+this.importeTotal;
+                                String nombreQr="imagenes/"+num+"_"+this.descripcionTipoComprobante+".gif";
+                        GenerarQr qr=new GenerarQr(dato,nombreQr);
                         pdfsJavaGenerador pdf=new pdfsJavaGenerador();
                         pdf.setDoc(this);
                         pdf.setPunto(this.numeroPuntoDeVenta);
@@ -395,234 +417,6 @@ public class FacturaElectronica implements FacturableE,Instalable{
         
         
         
-        /*
-        Comprobantes compro=new Comprobantes();
-        compro=(Comprobantes)comp;
-        FacturaElectronica fE=new FacturaElectronica();
-        if(Propiedades.getCONDICION().equals("2")){
-        URL url = new URL("https://tufacturaelectronica.net/api/v1/FE");
-        String charSet="UTF-8";
-        String tipo="xml";
-        String key=Propiedades.getKEY();
-        String cuit=compro.getCliente().getNumeroDeCuit().trim();
-        Integer codigoIdCliente=compro.getCliente().getCodigoId();
-        Integer tipDocumento=0;
-        Integer tipComprobante=0;
-        
-        String idCliente=compro.getCliente().getNumeroDeCuit();
-        fE.setEstado(compro.getPagado());
-        if(idCliente.length() == 8 || idCliente.length()==11){
-            
-        }else{
-            
-            idCliente=JOptionPane.showInputDialog(null,"Ingrese numero de CUIT/CUIL o DNI Sin puntos ni guiones ",idCliente);
-            if(idCliente.equals("0")){
-                idCliente="00000000";
-            }
-        }
-        idCliente=idCliente.replace("-","");
-        idCliente=idCliente.trim();
-        Integer cantCuit=idCliente.length();
-        switch(cantCuit){
-            case 11:
-                if(compro.getTipoComprobante()==2)tipDocumento=80;
-                if(compro.getTipoComprobante()==10)tipDocumento=80;
-                if(compro.getTipoComprobante()==8)tipDocumento=80;
-                if(compro.getTipoComprobante()==3)tipDocumento=80;
-                if(compro.getTipoComprobante()==1)tipDocumento=86;
-                break;
-            case 8:
-                tipDocumento=96;
-                break;
-            case 7:
-                tipDocumento=96;
-                break;
-        }
-        String tipoDocumento=String.valueOf(tipDocumento);
-        System.out.println();
-        if(Propiedades.getCONDICION().equals("2")){
-            if(compro.getTipoComprobante()==1)tipComprobante=6;//factura B a consumidor final
-            if(compro.getTipoComprobante()==2)tipComprobante=1;//1 FACTURA A 
-            if(compro.getTipoComprobante()==9)tipComprobante=2;//2
-            if(compro.getTipoComprobante()==10)tipComprobante=3;//3 NOTA DE CREDITO A
-            if(compro.getTipoComprobante()==11)tipComprobante=7;
-            if(compro.getTipoComprobante()==12)tipComprobante=8;
-            if(compro.getTipoComprobante()==8)tipComprobante=8;//NTA DE CREDITO B A CONS FINAL y exento
-            if(compro.getTipoComprobante()==3)tipComprobante=6;// factura B A EXENTO
-        }else{
-            if(compro.getTipoComprobante()==1)tipComprobante=11;
-            if(compro.getTipoComprobante()==2)tipComprobante=11;//1
-            if(compro.getTipoComprobante()==9)tipComprobante=12;//2
-            if(compro.getTipoComprobante()==10)tipComprobante=13;//3
-            if(compro.getTipoComprobante()==11)tipComprobante=12;
-            if(compro.getTipoComprobante()==12)tipComprobante=13;
-        }
-        String tipoComprobante=String.valueOf(tipComprobante);
-        System.out.println(tipComprobante);
-        
-        String importeTotal;
-        String importeNeto;
-        String importeEx="0.0";
-        String impuestoLiq;
-        if(tipoComprobante.equals("8")|| tipoComprobante.equals("3")){
-            importeTotal=String.valueOf((compro.getMontoTotal() * -1));
-            importeNeto=String.valueOf((compro.getMontoBruto() * -1));
-            impuestoLiq=String.valueOf((compro.getMontoIva() * -1));
-        }else{
-            importeTotal=String.valueOf(compro.getMontoTotal());
-            importeNeto=String.valueOf(compro.getMontoBruto());
-            
-            impuestoLiq=String.valueOf(compro.getMontoIva());
-        }
-        
-        
-        
-        HttpURLConnection con = (HttpURLConnection)url.openConnection();
-        Authenticator au = new Authenticator() {
-         @Override
-         protected PasswordAuthentication
-            getPasswordAuthentication() {
-            return new PasswordAuthentication
-               ("mauro@bambusoft.com.ar", "SUtter001".toCharArray());
-         }
-      };
-      Authenticator.setDefault(au);
-      con.setDoOutput(true);
-      con.setRequestMethod("POST");
-      try{
-      OutputStreamWriter out=new OutputStreamWriter(
-      con.getOutputStream());
-      
-      out.write("TYPE="+tipo);
-      out.write("&PUBLIC_KEY="+key);
-      out.write("&CUSTOMERID="+idCliente);
-      out.write("&CUSTOMERTYPEDOC="+tipoDocumento);
-      out.write("&TIPO_COMPROBANTE="+tipoComprobante);
-      out.write("&IMPORTE_TOTAL="+importeTotal);
-      out.write("&IMPORTE_NETO="+importeNeto);
-      out.write("&IMP_OP_EX="+importeEx);
-      out.write("&IMPTO_LIQ="+impuestoLiq);
-      out.close();
-      
-      BufferedReader in=new BufferedReader(new InputStreamReader(con.getInputStream()));
-      String response;
-      String cadena="";
-      while((response=in.readLine())!=null){
-          System.out.println("cadena "+response);
-          cadena=response;
-      }
-          
-                  
-      //String cadena=response;
-      //in.close();
-      
-      DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
-        DocumentBuilder db=dbf.newDocumentBuilder();
-        //System.err.println(cadena);
-        InputSource archivo=new InputSource();
-        
-        archivo.setCharacterStream(new StringReader(cadena));
-        Document documento=db.parse(archivo);
-        //Document documento=db.parse(response);
-        documento.getDocumentElement().normalize();
-        org.w3c.dom.NodeList nodeLista=documento.getElementsByTagName("AFIP");
-        int cantidad=nodeLista.getLength();
-        System.out.println("Informacion de conecciones");
-        
-        for (int s = 0; s < cantidad; s++) {
-            
-	Node primerNodo = nodeLista.item(s);
-	String titulo;
-	String autor;
-	String hits;
-        System.err.println("numero nodo "+s);
-        
-	if (primerNodo.getNodeType() == Node.ELEMENT_NODE) {
-
-	Element primerElemento = (Element) primerNodo;
-        //Configuracion conf=new Configuracion();
-        
-	        org.w3c.dom.NodeList primerNombreElementoLista =primerElemento.getElementsByTagName("RESPONSE");
-	Element primerNombreElemento =(Element) primerNombreElementoLista.item(0);
-	        org.w3c.dom.NodeList primerNombre = primerNombreElemento.getChildNodes();
-	 fE.setRespuesta(((Node) primerNombre.item(0)).getNodeValue().toString());
-	System.out.println("respuesta : "  + fE.getRespuesta());
-        //conf.setNombreConeccion(nombreConeccion);
-	        org.w3c.dom.NodeList segundoNombreElementoLista =primerElemento.getElementsByTagName("CAE");
-	Element segundoNombreElemento =(Element) segundoNombreElementoLista.item(0);
-	        org.w3c.dom.NodeList segundoNombre = segundoNombreElemento.getChildNodes();
-
-	fE.setCae(((Node) segundoNombre.item(0)).getNodeValue().toString());
-	System.out.println("cae : "  + fE.getCae());
-        //conf.setStringDeUrl(stringDeUrl);
-	        org.w3c.dom.NodeList tercerNombreElementoLista =primerElemento.getElementsByTagName("CAE_VTO");
-	Element tercerNombreElemento =(Element) tercerNombreElementoLista.item(0);
-	        org.w3c.dom.NodeList tercerNombre = tercerNombreElemento.getChildNodes();
-    	fE.setCaeVto(((Node) tercerNombre.item(0)).getNodeValue().toString());
-	System.out.println("cae vencimiento : "  + fE.getCaeVto());
-        //conf.setUsuario(usuario);
-        org.w3c.dom.NodeList cuartoNombreElementoLista =primerElemento.getElementsByTagName("FECHA_CAE");
-	Element cuartoNombreElemento =(Element) cuartoNombreElementoLista.item(0);
-	        org.w3c.dom.NodeList cuartoNombre = cuartoNombreElemento.getChildNodes();
-    	fE.setFechaCae(((Node) cuartoNombre.item(0)).getNodeValue().toString());
-	System.out.println("fecha cae : "  + fE.getFechaCae());
-        //conf.setUsuario(usuario);
-        org.w3c.dom.NodeList quintoNombreElementoLista =primerElemento.getElementsByTagName("AFIPQTY");
-	Element quintoNombreElemento =(Element) quintoNombreElementoLista.item(0);
-	        org.w3c.dom.NodeList quintoNombre = quintoNombreElemento.getChildNodes();
-    	fE.setAfipQty(((Node) quintoNombre.item(0)).getNodeValue().toString());
-	System.out.println("afipqty : "  + fE.getAfipQty());
-        //conf.setUsuario(usuario);
-        org.w3c.dom.NodeList sextoNombreElementoLista =primerElemento.getElementsByTagName("AFIPLASTID");
-	Element sextoNombreElemento =(Element) sextoNombreElementoLista.item(0);
-	        org.w3c.dom.NodeList sextoNombre = sextoNombreElemento.getChildNodes();
-    	fE.setAfipPlastId(((Node) sextoNombre.item(0)).getNodeValue().toString());
-        int comprobanteId=Integer.parseInt(fE.getAfipPlastId());
-        fE.setAfipPlastId(String.valueOf(comprobanteId));
-	System.out.println("afipplastid : "  + fE.getAfipPlastId());
-        //conf.setUsuario(usuario);
-        org.w3c.dom.NodeList septimoNombreElementoLista =primerElemento.getElementsByTagName("AFIPLASTCBTE");
-	Element septimoNombreElemento =(Element) septimoNombreElementoLista.item(0);
-	        org.w3c.dom.NodeList septimoNombre = septimoNombreElemento.getChildNodes();
-    	fE.setAfipPlastCbte(((Node) septimoNombre.item(0)).getNodeValue().toString());
-        int comprobanteN=Integer.parseInt(fE.getAfipPlastCbte()) + 1;
-        fE.setAfipPlastCbte(String.valueOf(comprobanteN));
-	System.out.println("afipplastcbte : "  + fE.getAfipPlastCbte());
-        //conf.setClave(clave);
-        //listadoConecciones.add(conf);
-        
-	}
-        }
-        in.close();
-        }catch(java.net.UnknownHostException ex){
-          Logger.getLogger(FacturaElectronica.class.getName()).log(Level.SEVERE, null, ex);
-            System.err.println("En factura electronica: "+ex);
-            fE.setRespuesta("ERROR");
-        }catch(java.lang.NullPointerException ey){
-          Logger.getLogger(FacturaElectronica.class.getName()).log(Level.SEVERE, null, ey);
-            System.err.println("Parametros invalidos: "+ey);
-            fE.setRespuesta("PARAMETROS");  
-        }
-        
-        fE.setIdFactura(compro.getIdFactura());
-        fE.setIdCliente(codigoIdCliente);
-        fE.setCustomerId(idCliente);
-        fE.setCustomerTypeDoc(tipoDocumento);
-        fE.setTipoComprobante(tipoComprobante);
-        fE.setImporteTotal(importeTotal);
-        fE.setImporteNeto(importeNeto);
-        fE.setImpuestoLiquido(impuestoLiq);
-        //fE.setFecha(fE.getFechaCae());
-        //fE.setEstado(1);
-        fE.setId(guardar(fE));
-        
-        }
-        if(Propiedades.getCONDICION().equals("1")){
-            ComprobanteC comC=new ComprobanteC();
-            fE=(FacturaElectronica) comC.leer(comp);
-            
-        }
-        */
       return this;
     }
 
@@ -1032,7 +826,18 @@ public class FacturaElectronica implements FacturableE,Instalable{
             if(fE.tipoCompro==11)tipoComp=TipoComprobante.tcNotaDebitoC;
             if(fE.tipoCompro==12)tipoComp=TipoComprobante.tcNotaCreditoC;
         }
-        
+        if(tipoComp.equals("tcFacturaA"))fE.numeroTipoComprobante=1;
+            if(tipoComp.equals("tcNotaDebitoA"))fE.numeroTipoComprobante=2;
+            if(tipoComp.equals("tcNotaCreditoA"))fE.numeroTipoComprobante=3;
+            if(tipoComp.equals("tcFacturaB"))fE.numeroTipoComprobante=6;
+            if(tipoComp.equals("tcNotaDebitoB"))fE.numeroTipoComprobante=7;
+            if(tipoComp.equals("tcNotaCreditoB"))fE.numeroTipoComprobante=8;
+            if(tipoComp.equals("tcFacturaC"))fE.numeroTipoComprobante=11;
+            if(tipoComp.equals("tcNotaDebitoC"))fE.numeroTipoComprobante=12;
+            if(tipoComp.equals("tcNotaCreditoC"))fE.numeroTipoComprobante=13;
+            
+        fE.descripcionTipoComprobante=tipoComp.name();
+        System.out.println("Descripcion tipo de comprobante "+tipoComp.name());
         fE.leer();
         return fE.guardarEnFiscal();
     }
