@@ -285,7 +285,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
     private Integer guardarEnFiscal(){
         String fecha=Numeros.ConvertirFechaFiscal();
                Transaccionable tra=new Conecciones();
-               /*
+               
                String tipo=String.valueOf(comp.getTipoComprobanteFiscal());
                String numero=String.valueOf(numeroComprobante);
                comp.setMontoBruto(comp.getMontoTotal() / 1.21);
@@ -302,7 +302,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
                sql="insert into fiscal (fecha,tipo,numero,gravado,impuesto,total,idcliente,tipoClienteId,razon,cuit) values (lpad("+fecha+",8,'0'),'"+tipo+"','"+numero+"',"+comp.getMontoBruto()+","+comp.getMontoIva()+","+comp.getMontoTotal()+","+comp.getCliente().getCodigoId()+","+tipoClienteId+",'"+razonS+"','"+cuit+"')";
                System.out.println("fiscal: "+sql);
                tra.guardarRegistro(sql);
-        */
+        
                return 0;
     }
     private Object leer(){
@@ -393,6 +393,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         String dato="Vendedor: "+this.cuitVendedor+" customerId:"+this.customerId+"cae:"+this.cae+"vto:"+this.caeVto+"monto:"+this.importeTotal;
                                 String nombreQr="imagenes/"+num+"_"+this.descripcionTipoComprobante+".gif";
                         GenerarQr qr=new GenerarQr(dato,nombreQr);
+                        this.nombreQr=nombreQr;
                         pdfsJavaGenerador pdf=new pdfsJavaGenerador();
                         pdf.setDoc(this);
                         pdf.setPunto(this.numeroPuntoDeVenta);

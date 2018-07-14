@@ -622,7 +622,7 @@ public class pdfsJavaGenerador {
             cb.setTextMatrix(20,renglon);
             Image imagen1= Image.getInstance(doc.getNombreQr());
                 //imagen.scaleAbsolute(84, 410);
-                imagen1.setAbsolutePosition(20,180);
+                imagen1.setAbsolutePosition(30,75);
                 documento.add(imagen1);
             
             renglon=renglon - 50;

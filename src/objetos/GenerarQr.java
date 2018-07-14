@@ -13,7 +13,7 @@ import com.barcodelib.barcode.QRCode;
  */
 public class GenerarQr {
     int udm=0,resol=72,rot=0;
-    float mi=0.00f,md=0.00f,ms=0.00f,min=0.00f,tam=5;
+    float mi=0.00f,md=0.00f,ms=0.00f,min=0.00f,tam=3;
 
     public GenerarQr(String dato,String nombre) {
         try{
