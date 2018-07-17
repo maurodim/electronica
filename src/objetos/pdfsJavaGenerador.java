@@ -201,7 +201,7 @@ public class pdfsJavaGenerador {
             
             switch (comF){
                 case 1:
-                    cb.showText("FACTURA");
+                    cb.showText("FACTURA A");
                     cb.setTextMatrix(290, 775);
                     cb.setFontAndSize(bf,26);
                     cb.showText("A");
@@ -211,7 +211,7 @@ public class pdfsJavaGenerador {
                     
                     break;
                 case 2:
-                    cb.showText("NTA DE DEBITO");
+                    cb.showText("N DE DEBITO A");
                     cb.setTextMatrix(290, 775);
                     cb.setFontAndSize(bf,26);
                     cb.showText("A");
@@ -220,7 +220,7 @@ public class pdfsJavaGenerador {
                     cb.showText("COD. 0"+comF);
                     break;
                 case 3:
-                    cb.showText("NTA DE CREDITO");
+                    cb.showText("N DE CREDITO A");
                     cb.setTextMatrix(290, 775);
                     cb.setFontAndSize(bf,26);
                     cb.showText("A");
@@ -229,7 +229,7 @@ public class pdfsJavaGenerador {
                     cb.showText("COD. 0"+comF);
                     break;
                 case 6:
-                    cb.showText("FACTURA");
+                    cb.showText("FACTURA B");
                     cb.setTextMatrix(290, 775);
                     cb.setFontAndSize(bf,26);
                     cb.showText("B");
@@ -238,7 +238,7 @@ public class pdfsJavaGenerador {
                     cb.showText("COD. 0"+comF);
                     break;
                 case 7:
-                    cb.showText("NTA DE DEBITO");
+                    cb.showText("N DE DEBITO B");
                     cb.setTextMatrix(290, 775);
                     cb.setFontAndSize(bf,26);
                     cb.showText("B");
@@ -247,7 +247,7 @@ public class pdfsJavaGenerador {
                     cb.showText("COD. 0"+comF);
                     break;
                 case 8:
-                    cb.showText("NTA DE CREDITO");
+                    cb.showText("N DE CREDITO B");
                     cb.setTextMatrix(290, 775);
                     cb.setFontAndSize(bf,26);
                     cb.showText("B");
@@ -265,7 +265,7 @@ public class pdfsJavaGenerador {
                     cb.showText("COD. 0"+comF);
                     break;
                 case 12:
-                    cb.showText("NOTA DE DEBITO C");
+                    cb.showText("N DE DEBITO C");
                     cb.setTextMatrix(290, 775);
                     cb.setFontAndSize(bf,26);
                     cb.showText("C");
@@ -274,7 +274,7 @@ public class pdfsJavaGenerador {
                     cb.showText("COD. 0"+comF);
                     break;
                 case 13:
-                    cb.showText("NOTA DE CREDITO C");
+                    cb.showText("N DE CREDITO C");
                     cb.setTextMatrix(290, 775);
                     cb.setFontAndSize(bf,26);
                     cb.showText("C");

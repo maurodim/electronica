@@ -6,11 +6,14 @@
 package ifu.demo;
 
 import interfaces.FacturableE;
+import java.io.IOException;
 import java.sql.Connection;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import objetos.DetalleFacturas;
 import objetos.FacturaElectronica;
-import objetos.GenerarQr;
 
 /**
  *
@@ -20,9 +23,29 @@ public class FEAFIPDemo {
 
     /**
      * @param args the command line arguments
+     * condicion-Condicion Iva Vendedor 1 - monotributo 2 - responsable inscripto/exento
+     * archivokey- lee de propiedades
+     * archivocrt- idem key
+     * idcliente-id interno del sistema
+     * cuitCliente-numero de cuit del cliente en string
+     * tipoD-tipo documento del cliente (80-cuit,96-dni,99-0 para consumidor final)
+     * tipoC-tipo comprobante de venta (fcc,fca,fcb,etc)
+     * montoT-monto total
+     * montoB-monto neto
+     * montoI- monto de iva
+     * ptoVta- punto de venta del vendedor, aprobado por afip
+     * cuitVendedor-lee de propiedades es un string
+     * tVta- tipo de venta, si es un producto o servicio
+     * listadoI-listado de iva
+     * listadoT-listado de tributos
+     * razon- razon social del comprador
+     * direc- direccion del comprador, incluir localidad
+     * condicionIvaC- condicion iva comprador
+     * lstDetalle- listado e detalle factura
+     * 
      */
-    public static void main(String[] args) {
-        
+    public static void main(String[] args) throws ParseException {
+        /*
         FacturableE factu=new FacturaElectronica();
         Connection conexion=null;
         int condicion=1;
@@ -53,11 +76,9 @@ public class FEAFIPDemo {
         detalle.setPrecioUnitario(1.0);
         lstDetalle.add(detalle);
         double cuit=2022905383.0;
-        //String cuitClien=Float.toString((float) 20229053834.0);
-        //GenerarQr qr=new GenerarQr(condicion+idCliente+cuitCliente+tipoD+tipoC+montoT+montoB+montoI+ptoVta+cuitVendedor+tVta+razon+direc+condicionIvaC);
-        //System.out.println(Float.toString(cuit)+" convertido: "+cuitClien);
+        
         factu.generar(conexion, condicion, archivoKey, archivoCrt, idCliente, cuitCliente, tipoD, tipoC, montoT,montoB,montoI,ptoVta, cuitVendedor,tVta,listadoI,listadoT,razon,direc,condicionIvaC,lstDetalle);
-        /*
+        
         MainFrame mainFrame = new MainFrame();
         mainFrame.setVisible(true);
         mainFrame.setSize(600, 400);

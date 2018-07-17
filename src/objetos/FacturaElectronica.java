@@ -298,7 +298,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
                String razonS=this.razonSocial;
                String cuit=this.customerId;
                if(cuit.equals("1"))cuit="0";
-               String sql="insert into fiscal (fecha,tipo,numero,gravado,impuesto,total,idcliente,tipoClienteId,razon,cuit) values (lpad("+fecha+",8,'0'),'"+tipo+"','"+numero+"',"+this.importeNeto+","+this.impuestoLiquido+","+this.importeTotal+","+this.idCliente+","+tipoClienteId+",'"+razonS+"','"+cuit+"')";
+               String sql="insert into fiscal (fecha,tipo,pto,numero,gravado,impuesto,total,idcliente,tipoClienteId,razon,cuit) values (lpad("+fecha+",8,'0'),'"+tipo+"',lpad("+this.numeroPuntoDeVenta+",5,'0'),'"+numero+"',"+this.importeNeto+","+this.impuestoLiquido+","+this.importeTotal+","+this.idCliente+","+tipoClienteId+",'"+razonS+"','"+cuit+"')";
                System.out.println("fiscal: "+sql);
                tra.guardarRegistro(sql);
         
@@ -316,7 +316,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
 
         int ptoVta = this.numeroPuntoDeVenta; // ATENCION! SI RECIBE UN ERROR DE FECHA O NUMERO DE COMPROBANTE EN ESTA DEMO CAMBIE ESTE VALOR POR OTRO DE 1 A 9999
         
-        tipoComp = TipoComprobante.tcFacturaC; // Factura A(Ver excel referencias codigos AFIP)
+        //tipoComp = TipoComprobante.tcFacturaC; // Factura A(Ver excel referencias codigos AFIP)
         
         
         
@@ -324,7 +324,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
         String FechaComp = formatter.format(new Date());
          
         Iwsfev1 wsfev1 = ClassFactory.createwsfev1();
-        double cuitV= Double.parseDouble("20229053834");
+        double cuitV= Double.parseDouble(this.cuitVendedor);
         double cuitC=Double.parseDouble(this.customerId);
         int customerTD=Integer.parseInt(this.customerTypeDoc);
         String montoT=String.valueOf(this.importeTotal);
@@ -339,7 +339,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
         wsfev1.url(URLWSW);
         System.out.println(URLWSW+" wsaa "+URLWSAA);
         if (wsfev1.login(this.archivoCrt, this.archivoKey, URLWSAA)){
-            if (!wsfev1.sfRecuperaLastCMP(ptoVta, tipoComp.comEnumValue())) {
+            if (!wsfev1.sfRecuperaLastCMP(ptoVta, this.tipoComp.comEnumValue())) {
                 JOptionPane.showMessageDialog(null,wsfev1.errorDesc());
             } else {
                 nro = wsfev1.sfLastCMP() + 1;
@@ -369,11 +369,11 @@ public class FacturaElectronica implements FacturableE,Instalable{
                 }else{
                     wsfev1.agregaFactura(this.tipoVta,customerTD, cuitC, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, FechaComp,FechaComp,FechaComp, "PES", 1);
                 }
-                if (!wsfev1.autorizar(ptoVta, (TipoComprobante)tipoComp)){
+                if (!wsfev1.autorizar(ptoVta, (TipoComprobante)this.tipoComp)){
                     JOptionPane.showMessageDialog(null,wsfev1.errorDesc());
                 } else {
                     if (wsfev1.sfResultado(0).equals("A")) {
-                        JOptionPane.showMessageDialog(null,"Felicitaciones! Si ve este mensaje instalo correctamente FEAFIP. CAE y Vencimiento: " + wsfev1.sfcae(0) + " " + wsfev1.sfVencimiento(0)+" numero comprobante "+nro);
+                        //JOptionPane.showMessageDialog(null,"Felicitaciones! Si ve este mensaje instalo correctamente FEAFIP. CAE y Vencimiento: " + wsfev1.sfcae(0) + " " + wsfev1.sfVencimiento(0)+" numero comprobante "+nro);
                         this.cae=wsfev1.sfcae(0);
                         this.caeVto=wsfev1.sfVencimiento(0);
                         String num=String.valueOf(nro);
@@ -382,7 +382,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         num=num.substring(0,nume);
                         this.afipPlastId=num;
                         this.afipPlastCbte=num;
-                        this.tipoComprobante=String.valueOf((TipoComprobante)tipoComp);
+                        this.tipoComprobante=String.valueOf((TipoComprobante)this.tipoComp);
                         this.fechaCae=FechaComp;
                         
                         //IContribuyente iContribuyente=ClassFactory.createContribuyente();
@@ -810,34 +810,34 @@ public class FacturaElectronica implements FacturableE,Instalable{
         if(fE.condicionIvaVendedor.equals("2")){
             
             
-            if(fE.tipoCompro==1)tipoComp=TipoComprobante.tcFacturaB;//factura B a consumidor final
-            if(fE.tipoCompro==2)tipoComp=TipoComprobante.tcFacturaA;//1 FACTURA A 
-            if(fE.tipoCompro==9)tipoComp=TipoComprobante.tcNotaDebitoA;//2
-            if(fE.tipoCompro==10)tipoComp=TipoComprobante.tcNotaCreditoA;//3 NOTA DE CREDITO A
-            if(fE.tipoCompro==11)tipoComp=TipoComprobante.tcNotaDebitoB;
-            if(fE.tipoCompro==12)tipoComp=TipoComprobante.tcNotaCreditoB;//tipComprobante=8;
-            if(fE.tipoCompro==8)tipoComp=TipoComprobante.tcFacturaB;//NTA DE CREDITO B A CONS FINAL y exento
-            if(fE.tipoCompro==3)tipoComp=TipoComprobante.tcFacturaB;// factura B A EXENTO
+            if(fE.tipoCompro==1)fE.tipoComp=TipoComprobante.tcFacturaB;//factura B a consumidor final
+            if(fE.tipoCompro==2)fE.tipoComp=TipoComprobante.tcFacturaA;//1 FACTURA A 
+            if(fE.tipoCompro==9)fE.tipoComp=TipoComprobante.tcNotaDebitoA;//2
+            if(fE.tipoCompro==10)fE.tipoComp=TipoComprobante.tcNotaCreditoA;//3 NOTA DE CREDITO A
+            if(fE.tipoCompro==11)fE.tipoComp=TipoComprobante.tcNotaDebitoB;
+            if(fE.tipoCompro==12)fE.tipoComp=TipoComprobante.tcNotaCreditoB;//tipComprobante=8;
+            if(fE.tipoCompro==8)fE.tipoComp=TipoComprobante.tcFacturaB;//NTA DE CREDITO B A CONS FINAL y exento
+            if(fE.tipoCompro==3)fE.tipoComp=TipoComprobante.tcFacturaB;// factura B A EXENTO
         }else{
-            if(fE.tipoCompro==1)tipoComp=TipoComprobante.tcFacturaC;
-            if(fE.tipoCompro==2)tipoComp=TipoComprobante.tcFacturaC;//1
-            if(fE.tipoCompro==9)tipoComp=TipoComprobante.tcNotaDebitoC;//2
-            if(fE.tipoCompro==10)tipoComp=TipoComprobante.tcNotaCreditoC;//3
-            if(fE.tipoCompro==11)tipoComp=TipoComprobante.tcNotaDebitoC;
-            if(fE.tipoCompro==12)tipoComp=TipoComprobante.tcNotaCreditoC;
+            if(fE.tipoCompro==1)fE.tipoComp=TipoComprobante.tcFacturaC;
+            if(fE.tipoCompro==2)fE.tipoComp=TipoComprobante.tcFacturaC;//1
+            if(fE.tipoCompro==9)fE.tipoComp=TipoComprobante.tcNotaDebitoC;//2
+            if(fE.tipoCompro==10)fE.tipoComp=TipoComprobante.tcNotaCreditoC;//3
+            if(fE.tipoCompro==11)fE.tipoComp=TipoComprobante.tcNotaDebitoC;
+            if(fE.tipoCompro==12)fE.tipoComp=TipoComprobante.tcNotaCreditoC;
         }
-        if(tipoComp.equals("tcFacturaA"))fE.numeroTipoComprobante=1;
-            if(tipoComp.equals("tcNotaDebitoA"))fE.numeroTipoComprobante=2;
-            if(tipoComp.equals("tcNotaCreditoA"))fE.numeroTipoComprobante=3;
-            if(tipoComp.equals("tcFacturaB"))fE.numeroTipoComprobante=6;
-            if(tipoComp.equals("tcNotaDebitoB"))fE.numeroTipoComprobante=7;
-            if(tipoComp.equals("tcNotaCreditoB"))fE.numeroTipoComprobante=8;
-            if(tipoComp.equals("tcFacturaC"))fE.numeroTipoComprobante=11;
-            if(tipoComp.equals("tcNotaDebitoC"))fE.numeroTipoComprobante=12;
-            if(tipoComp.equals("tcNotaCreditoC"))fE.numeroTipoComprobante=13;
+        if(fE.tipoComp.equals(TipoComprobante.tcFacturaA))fE.numeroTipoComprobante=1;
+            if(fE.tipoComp.equals(TipoComprobante.tcNotaDebitoA))fE.numeroTipoComprobante=2;
+            if(fE.tipoComp.equals(TipoComprobante.tcNotaCreditoA))fE.numeroTipoComprobante=3;
+            if(fE.tipoComp.equals(TipoComprobante.tcFacturaB))fE.numeroTipoComprobante=6;
+            if(fE.tipoComp.equals(TipoComprobante.tcNotaDebitoB))fE.numeroTipoComprobante=7;
+            if(fE.tipoComp.equals(TipoComprobante.tcNotaCreditoB))fE.numeroTipoComprobante=8;
+            if(fE.tipoComp.equals(TipoComprobante.tcFacturaC))fE.numeroTipoComprobante=11;
+            if(fE.tipoComp.equals(TipoComprobante.tcNotaDebitoC))fE.numeroTipoComprobante=12;
+            if(fE.tipoComp.equals(TipoComprobante.tcNotaCreditoC))fE.numeroTipoComprobante=13;
             
-        fE.descripcionTipoComprobante=tipoComp.name();
-        System.out.println("Descripcion tipo de comprobante "+tipoComp.name());
+        fE.descripcionTipoComprobante=fE.tipoComp.name();
+        System.out.println("Descripcion tipo de comprobante "+fE.tipoComp.name());
         fE.leer();
         return fE.guardarEnFiscal();
     }
