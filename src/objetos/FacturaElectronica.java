@@ -2,16 +2,14 @@ package objetos;
 
 
 
-import Configuracion.Propiedades;
 import conversiones.Numeros;
 import feafip.bi.ClassFactory;
-import feafip.bi.IContribuyente;
+import feafip.bi.IwsPadron;
 import feafip.bi.Iwsfev1;
 import feafip.bi.TipoComprobante;
 import interfaces.FacturableE;
 import interfaces.Instalable;
 import interfaces.Transaccionable;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -67,6 +65,15 @@ public class FacturaElectronica implements FacturableE,Instalable{
     private String descripcionTipoComprobante;
     private String nombreQr;
 
+    public ArrayList getListadoIva() {
+        return listadoIva;
+    }
+
+    public ArrayList getListadoTributos() {
+        return listadoTributos;
+    }
+
+    
     public String getNombreQr() {
         return nombreQr;
     }
@@ -308,9 +315,9 @@ public class FacturaElectronica implements FacturableE,Instalable{
         // Los nombres de los parametros de las funciones se obtienen en FEAFIP.pdf
         
         //URLs de autenticacion y negocio. Cambiarlas por las de producción al implementarlas en el cliente(abajo)
-        String URLWSAA = "https://wsaa.afip.gov.ar/ws/services/LoginCms";//"https://wsaahomo.afip.gov.ar/ws/services/LoginCms";
+        String URLWSAA = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms";
           // Producción: https://wsaa.afip.gov.ar/ws/services/LoginCms
-        String URLWSW = "https://servicios1.afip.gov.ar/wsfev1/service.asmx";//"https://wswhomo.afip.gov.ar/wsfev1/service.asmx";
+        String URLWSW = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx";
           // Producción: https://servicios1.afip.gov.ar/wsfev1/service.asmx
         double nro;
 
@@ -344,8 +351,10 @@ public class FacturaElectronica implements FacturableE,Instalable{
             } else {
                 nro = wsfev1.sfLastCMP() + 1;
                 wsfev1.reset();
+                System.out.println("importes total: "+this.importeTotal+" neto: "+this.importeNeto);
                 if(this.condicionIvaVendedor.equals("2")){
-                    wsfev1.agregaFactura(this.tipoVta,customerTD, cuitC, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, "", "", "", "PES", 1);
+                    if(this.tipoVta==1)wsfev1.agregaFactura(this.tipoVta,customerTD, cuitC, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, "", "", "", "PES", 1);
+                    if(this.tipoVta==2)wsfev1.agregaFactura(this.tipoVta,customerTD, cuitC, nro, nro, FechaComp, this.importeTotal, 0,this.importeNeto, 0, FechaComp,FechaComp,FechaComp, "PES", 1);
                     //wsfev1.agregaFactura(2, 99,0.0, nro, nro, FechaComp, 1.5, 0, 1.5, 0, FechaComp, FechaComp, FechaComp, "PES", 1);
                     
                     
@@ -356,6 +365,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         while(itI.hasNext()){
                             tipoI=(TiposIva) itI.next();
                             wsfev1.agregaIVA(tipoI.getId(),tipoI.getBaseImponible(),tipoI.getImporte()); // Ver Excel de referencias de codigos AFIP
+                            System.out.println("importes iva // imponible: "+tipoI.getBaseImponible()+" importe: "+tipoI.getImporte());
                             //wsfev1.agregaIVA(1, 0,0); // Ver Excel de referencias de codigos AFIP
                         }
                     }
@@ -364,6 +374,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         while(itT.hasNext()){
                             tributos=(Tributos) itT.next();
                             wsfev1.agregaTributo(tributos.getId(),tributos.getDescripcion(),tributos.getBaseImponible(),tributos.getAlicuota(),tributos.getImporte());
+                            System.out.println("importe tributo // imponible: "+tributos.getBaseImponible()+" importe: "+tributos.getImporte());
                         }
                     }
                 }else{
@@ -389,7 +400,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
                         //System.out.println(iContribuyente.condicionIVADesc()+" numero iva "+iContribuyente.condicionIVA().comEnumValue());
                         this.estado=1;
                         //ACA DEBERÍA PASAR LOS VALORES A PDF PARA QUE SE GENERE LA FACTURA
-                        String dato="Vendedor: "+this.cuitVendedor+" customerId:"+this.customerId+"cae:"+this.cae+"vto:"+this.caeVto+"monto:"+this.importeTotal;
+                        String dato="Vendedor: "+this.cuitVendedor+" customerId:"+this.customerId+"cae:"+this.cae+"vto:"+this.caeVto+" Punto de venta:"+this.numeroPuntoDeVenta;
                                 String nombreQr="imagenes/"+num+"_"+this.descripcionTipoComprobante+".gif";
                         GenerarQr qr=new GenerarQr(dato,nombreQr);
                         this.nombreQr=nombreQr;
@@ -840,5 +851,17 @@ public class FacturaElectronica implements FacturableE,Instalable{
         System.out.println("Descripcion tipo de comprobante "+fE.tipoComp.name());
         fE.leer();
         return fE.guardarEnFiscal();
+    }
+
+    @Override
+    public String solicitarCertificado(String cuit1) {
+        IwsPadron padron = ClassFactory.createwsPadron();
+        double cuit = 20229053834.0;
+        if (padron.descargarConstancia(cuit, "c:\\datos\\constancia.pdf")) {
+            System.out.println("Constancia descargada con éxito");  
+        } else {
+            System.out.println(padron.errorDesc());
+        }
+        return "Constancias\\"+cuit+"_constancia.pdf";
     }
 }

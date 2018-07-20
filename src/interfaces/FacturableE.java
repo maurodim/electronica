@@ -25,4 +25,5 @@ public interface FacturableE {
     public String reimprimir(Object fe);
     public String imprimir(Object fe);
     public Integer generar(Connection conexion,int Condicion,String archivoKey,String archivoCrt,Integer idCliente,String cuitCliente,int tipoDocumentoCliente,int tipoComprobante,Double montoTotal,Double montoBruto,Double montoIva,int ptoDeVenta,String cuitVendedor,int tipoVenta,ArrayList ivas,ArrayList tributos,String razonSocial,String direccion,String condicionIvaCliente,ArrayList lstDetalle);
+    public String solicitarCertificado(String cuit);
 }

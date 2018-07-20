@@ -420,10 +420,10 @@ public class pdfsJavaGenerador {
                 if(items==1){
                     cb.setTextMatrix(70,renglon);
 
-                    if(saldo.getDescripcionArticulo().length() > 40){
-                        descripcionArt=saldo.getDescripcionArticulo().substring(0, 40);
+                    if(saldo.getDescripcion().length() > 40){
+                        descripcionArt=saldo.getDescripcion().substring(0, 40);
                      }else{
-                         descripcionArt=saldo.getDescripcionArticulo();
+                         descripcionArt=saldo.getDescripcion();
                      }
                     cb.showText(descripcionArt);
                      renglon=renglon - 10;
@@ -432,11 +432,11 @@ public class pdfsJavaGenerador {
                 
                     cb.showText(String.valueOf(saldo.getIdArticulo()));
                     cb.setTextMatrix(70,renglon);
-                    if(saldo.getDescripcionArticulo() != null){
-                    if(saldo.getDescripcionArticulo().length() > 40){
-                        descripcionArt=saldo.getDescripcionArticulo().substring(0, 40);
+                    if(saldo.getDescripcion() != null){
+                    if(saldo.getDescripcion().length() > 40){
+                        descripcionArt=saldo.getDescripcion().substring(0, 40);
                      }else{
-                         descripcionArt=saldo.getDescripcionArticulo();
+                         descripcionArt=saldo.getDescripcion();
                      }
                     }else{
                         descripcionArt="";
@@ -538,37 +538,31 @@ public class pdfsJavaGenerador {
             Double sub=doc.getImporteNeto();
             Double iva=doc.getImpuestoLiquido();
             cb.showText("$ "+Numeros.ConvertirNumero(sub));
+            Iterator iIva=doc.getListadoIva().listIterator();
+            TiposIva tipos;
+            while(iIva.hasNext()){
+                tipos=(TiposIva) iIva.next();
+                renglon=renglon - 10;
+                cb.setTextMatrix(380,renglon);
+                cb.showText(tipos.getDescripcion());
+                cb.setTextMatrix(480,renglon);
+                cb.showText("$ "+String.valueOf(tipos.getImporte()));
+            }
+            
             renglon=renglon - 10;
-            cb.setTextMatrix(380,renglon);
-            cb.showText("Iva 27%");
-            cb.setTextMatrix(480,renglon);
-            cb.showText("$ 0.00");
+            Iterator iTri=doc.getListadoTributos().listIterator();
+            Tributos tributo;
+            while(iTri.hasNext()){
+                tributo=(Tributos) iTri.next();
+                cb.setTextMatrix(380,renglon);
+                cb.showText(tributo.getDescripcion());
+                cb.setTextMatrix(480,renglon);
+                cb.showText("$ "+String.valueOf(tributo.getImporte()));
+            }
             renglon=renglon - 10;
-            cb.setTextMatrix(380,renglon);
-            cb.showText("Iva 21%");
-            cb.setTextMatrix(480,renglon);
-            cb.showText("$ "+Numeros.ConvertirNumero(iva));
+             
             renglon=renglon - 10;
-            cb.setTextMatrix(380,renglon);
-            cb.showText("Iva 10,5%");
-            cb.setTextMatrix(480,renglon);
-            cb.showText("$ 0.00");
-            renglon=renglon - 10;
-            cb.setTextMatrix(380,renglon);
-            cb.showText("Iva 5%");
-            cb.setTextMatrix(480,renglon);
-            cb.showText("$ 0.00");
-            renglon=renglon - 10;
-            cb.setTextMatrix(380,renglon);
-            cb.showText("Iva 2,5%");
-            cb.setTextMatrix(480,renglon);
-            cb.showText("$ 0.00");
-            renglon=renglon - 10;
-            cb.setTextMatrix(380,renglon);
-            cb.showText("Iva 0%");
-            cb.setTextMatrix(480,renglon);
-            cb.showText("$ 0.00");
-            renglon=renglon - 10;
+            
             cb.setTextMatrix(380,renglon);
             cb.showText("Importe Total");
             cb.setTextMatrix(480,renglon);
@@ -625,14 +619,16 @@ public class pdfsJavaGenerador {
                 imagen1.setAbsolutePosition(30,75);
                 documento.add(imagen1);
             
-            renglon=renglon - 50;
+            renglon=30;
+                System.out.println("renglon imagenes afip "+renglon);
              Image imagen= Image.getInstance("imagenes/afip.JPG");
                 //imagen.scaleAbsolute(84, 410);
                 imagen.setAbsolutePosition(20,renglon);
                 documento.add(imagen);
                 Barcode128 codeEAN=new Barcode128();
                 codeEAN.setCodeType(Barcode.CODE128);
-                String codigoB=doc.getCustomerId()+comF+doc.getCae()+doc.getCaeVto()+"3";
+                String ccuit=encabezado.getCuit().replace("-","");
+                String codigoB=ccuit+doc.getNumeroPuntoDeVenta()+comF+doc.getCae()+doc.getCaeVto()+"3";
                 codeEAN.setCode(codigoB);
                 //codeEAN.setSize(5);
                 Image img=codeEAN.createImageWithBarcode(cb, Color.BLACK, Color.black);
