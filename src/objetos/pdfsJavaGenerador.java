@@ -538,29 +538,33 @@ public class pdfsJavaGenerador {
             Double sub=doc.getImporteNeto();
             Double iva=doc.getImpuestoLiquido();
             cb.showText("$ "+Numeros.ConvertirNumero(sub));
-            Iterator iIva=doc.getListadoIva().listIterator();
-            TiposIva tipos;
-            while(iIva.hasNext()){
-                tipos=(TiposIva) iIva.next();
-                renglon=renglon - 10;
-                cb.setTextMatrix(380,renglon);
-                cb.showText(tipos.getDescripcion());
-                cb.setTextMatrix(480,renglon);
-                cb.showText("$ "+String.valueOf(tipos.getImporte()));
-            }
             
-            renglon=renglon - 10;
-            Iterator iTri=doc.getListadoTributos().listIterator();
-            Tributos tributo;
-            while(iTri.hasNext()){
-                tributo=(Tributos) iTri.next();
-                cb.setTextMatrix(380,renglon);
-                cb.showText(tributo.getDescripcion());
-                cb.setTextMatrix(480,renglon);
-                cb.showText("$ "+String.valueOf(tributo.getImporte()));
+            if(doc.getListadoIva() != null){
+                Iterator iIva=doc.getListadoIva().listIterator();
+                TiposIva tipos;
+                while(iIva.hasNext()){
+                    tipos=(TiposIva) iIva.next();
+                    renglon=renglon - 10;
+                    cb.setTextMatrix(380,renglon);
+                    cb.showText(tipos.getDescripcion());
+                    cb.setTextMatrix(480,renglon);
+                    cb.showText("$ "+String.valueOf(tipos.getImporte()));
+                }
+
+                renglon=renglon - 10;
             }
-            renglon=renglon - 10;
-             
+            if(doc.getListadoTributos() != null){
+                Iterator iTri=doc.getListadoTributos().listIterator();
+                Tributos tributo;
+                while(iTri.hasNext()){
+                    tributo=(Tributos) iTri.next();
+                    cb.setTextMatrix(380,renglon);
+                    cb.showText(tributo.getDescripcion());
+                    cb.setTextMatrix(480,renglon);
+                    cb.showText("$ "+String.valueOf(tributo.getImporte()));
+                }
+                renglon=renglon - 10;
+            }
             renglon=renglon - 10;
             
             cb.setTextMatrix(380,renglon);

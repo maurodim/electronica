@@ -794,7 +794,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
     }
 
     @Override
-    public Integer generar(Connection conexion, int Condicion, String archivoKey, String archivoCrt, Integer idCliente, String cuitCliente, int tipoDocumentoCliente, int tipoComprobante, Double montoTotal, Double montoBruto, Double montoIva,int ptoDeVenta,String cuitVendedor,int tipoV,ArrayList lstI,ArrayList lstT,String razonSocial,String direccion,String condicionIvaCliente,ArrayList lstDetalle) {
+    public Integer generar(Connection conexion, int Condicion, String archivoKey, String archivoCrt, Integer idCliente, String cuitCliente, int tipoComprobante, Double montoTotal, Double montoBruto, Double montoIva,int ptoDeVenta,String cuitVendedor,int tipoV,ArrayList lstI,ArrayList lstT,String razonSocial,String direccion,String condicionIvaCliente,ArrayList lstDetalle) {
         FacturaElectronica fE=new FacturaElectronica();
         fE.listadoIva=new ArrayList();
         fE.listadoTributos=new ArrayList();
@@ -803,6 +803,38 @@ public class FacturaElectronica implements FacturableE,Instalable{
         fE.archivoKey=archivoKey;
         fE.archivoCrt=archivoCrt;
         fE.idCliente=idCliente;
+        
+        
+        if(cuitCliente.length() == 8 || cuitCliente.length()==11){
+            
+        }else{
+            
+            cuitCliente=JOptionPane.showInputDialog(null,"Ingrese numero de CUIT/CUIL o DNI Sin puntos ni guiones ",cuitCliente);
+            if(idCliente.equals("0")){
+                cuitCliente="00000000";
+            }
+        }
+        cuitCliente=cuitCliente.replace("-","");
+        cuitCliente=cuitCliente.trim();
+        Integer cantCuit=cuitCliente.length();
+        int tipDocumento=0;
+        switch(cantCuit){
+            case 11:
+                if(tipoComprobante==2)tipDocumento=80;
+                if(tipoComprobante==10)tipDocumento=80;
+                if(tipoComprobante==8)tipDocumento=80;
+                if(tipoComprobante==3)tipDocumento=80;
+                if(tipoComprobante==1)tipDocumento=86;
+                break;
+            case 8:
+                tipDocumento=96;
+                break;
+            case 7:
+                tipDocumento=96;
+                break;
+        }
+        String tipoDocumentoCliente=String.valueOf(tipDocumento);
+        
         fE.customerId=cuitCliente;
         fE.customerTypeDoc=String.valueOf(tipoDocumentoCliente);
         fE.numeroPuntoDeVenta=ptoDeVenta;

@@ -6,16 +6,11 @@
 package ifu.demo;
 
 import interfaces.FacturableE;
-import java.io.IOException;
 import java.sql.Connection;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import objetos.DetalleFacturas;
 import objetos.FacturaElectronica;
-import objetos.TiposIva;
-import objetos.Tributos;
 
 /**
  *
@@ -47,20 +42,20 @@ public class FEAFIPDemo {
      * 
      */
     public static void main(String[] args) throws ParseException {
-       
+       /*
         FacturableE factu=new FacturaElectronica();
-        /*
+        
         Connection conexion=null;
-        int condicion=2;
+        int condicion=1;
         String archivoKey="clave.key";
         String archivoCrt="certificado.crt";
         int idCliente=1;
         String cuitCliente="30538872128";
         int tipoD=80;//80- cuit 96- dni
-        int tipoC=2;
-        Double montoT=120.75;
+        int tipoC=1;
+        Double montoT=100.0;
         Double montoB=100.0;
-        Double montoI=15.75;
+        Double montoI=0.0;
         int ptoVta=3;
         String cuitVendedor="20229053834";
         int tVta=2;//SI ES SERVICIO=2 O PRODUCTO=1
@@ -78,12 +73,14 @@ public class FEAFIPDemo {
         detalle.setCantidadS("1.0");
         detalle.setPrecioUnitarioS("100.0");
         lstDetalle.add(detalle);
-        TiposIva iva=new TiposIva(5,50,10.5f,21);
-        listadoI.add(iva);
-        iva=new TiposIva(4,50,5.25f,10.5f);
-        listadoI.add(iva);
-        Tributos tributo=new Tributos(2,"IB Santa Fe",100,5,5);
-        listadoT.add(tributo);
+        //TiposIva iva=new TiposIva(5,50,10.5f,21);
+        //listadoI.add(iva);
+        //iva=new TiposIva(4,50,5.25f,10.5f);
+        //listadoI.add(iva);
+        //Tributos tributo=new Tributos(2,"IB Santa Fe",100,5,5);
+        //listadoT.add(tributo);
+        listadoI=null;
+        listadoT=null;
         double cuit=20229053834.0;
         
         factu.generar(conexion, condicion, archivoKey, archivoCrt, idCliente, cuitCliente, tipoD, tipoC, montoT,montoB,montoI,ptoVta, cuitVendedor,tVta,listadoI,listadoT,razon,direc,condicionIvaC,lstDetalle);
@@ -91,8 +88,9 @@ public class FEAFIPDemo {
         MainFrame mainFrame = new MainFrame();
         mainFrame.setVisible(true);
         mainFrame.setSize(600, 400);
-*/
+
        factu.solicitarCertificado("20229053834.0");
+*/
     }
     
 }
