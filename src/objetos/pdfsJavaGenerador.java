@@ -61,7 +61,7 @@ public class pdfsJavaGenerador {
     
     
     
-    public void run(){
+    public String run(){
         Document documento=new Document();
         int i=1;
         String clienteF=doc.getAfipPlastCbte().replace(":","_");
@@ -322,6 +322,7 @@ public class pdfsJavaGenerador {
             }
             cb.showText("Cond. Vta: "+condV);
             cb.setTextMatrix(380,650);
+            try{
             Integer condIvv=Integer.parseInt(cliente.getCondicionIva());
             switch(condIvv){
                 case 1:
@@ -336,6 +337,9 @@ public class pdfsJavaGenerador {
                 default:
                     cb.showText("Cond. Iva: Consumidor Final");
                     break;
+            }
+            }catch(java.lang.NumberFormatException ex){
+                cb.showText("Cond. Iva: "+cliente.getCondicionIva());
             }
             //cb.showText("Cond. Iva: "+cliente.getCondicionIva());
             cb.setTextMatrix(40,650);
@@ -679,7 +683,7 @@ public class pdfsJavaGenerador {
         } catch (IOException ex) {
             Logger.getLogger(pdfsJavaGenerador.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        return arch;
         
     }
 }

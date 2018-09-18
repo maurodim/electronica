@@ -11,11 +11,11 @@ package objetos;
  */
 public class TiposIva {
     private int id;
-    private float baseImponible;
-    private float importe;
+    private double baseImponible;
+    private double importe;
     private String descripcion;
 
-    public TiposIva(int id, float baseImponible, float importe,float alicuota) {
+    public TiposIva(int id, double baseImponible, double importe,double alicuota) {
         this.id = id;
         this.baseImponible = baseImponible;
         this.importe = importe;
@@ -31,11 +31,11 @@ public class TiposIva {
         return id;
     }
 
-    public float getBaseImponible() {
+    public double getBaseImponible() {
         return baseImponible;
     }
 
-    public float getImporte() {
+    public double getImporte() {
         return importe;
     }
     
