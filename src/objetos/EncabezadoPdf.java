@@ -5,6 +5,8 @@
  */
 package objetos;
 
+import Configuracion.Propiedades;
+
 /**
  *
  * @author mauro
@@ -24,14 +26,14 @@ public class EncabezadoPdf {
     public EncabezadoPdf(int punto, double numero) {
         this.punto = punto;
         this.numero = numero;
-        this.nombreComercio="BAMBUSOFT";
-        this.razonSocial="Mauro Di";
-        this.direccion="Alberti 1479, Santa Fe";
-        this.telefono="0342-4600332";
-        this.cuit="20-22905383-4";
-        this.ingresosBrutos="011-13150619513";
-        this.inicioActividades="01/10/2013";
-        this.condicionIva="Responsable Monotributo";
+        this.nombreComercio=Propiedades.getNOMBRECOMERCIO();
+        this.razonSocial=Propiedades.getNOMBRECOMERCIO();
+        this.direccion=Propiedades.getDIRECCION();
+        this.telefono=Propiedades.getTELEFONO();
+        this.cuit=Propiedades.getCUIT();
+        this.ingresosBrutos=Propiedades.getINGBRUTOS();
+        this.inicioActividades=Propiedades.getINICIOACT();
+        this.condicionIva="Responsable Inscripto";
     }
 
     public String getCondicionIva() {

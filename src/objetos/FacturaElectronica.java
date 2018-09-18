@@ -328,7 +328,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
         //URLs de autenticacion y negocio. Cambiarlas por las de producción al implementarlas en el cliente(abajo)
         String URLWSAA = "https://wsaa.afip.gov.ar/ws/services/LoginCms";//"https://wsaahomo.afip.gov.ar/ws/services/LoginCms";
           // Producción: https://wsaa.afip.gov.ar/ws/services/LoginCms
-        String URLWSW = "https//servicios1.afip.gov.ar/wsfev1/service.asmx";//"https://wswhomo.afip.gov.ar/wsfev1/service.asmx";
+        String URLWSW = "https://servicios1.afip.gov.ar/wsfev1/service.asmx";//"https://wswhomo.afip.gov.ar/wsfev1/service.asmx";
           // Producción: https://servicios1.afip.gov.ar/wsfev1/service.asmx
         double nro;
 
