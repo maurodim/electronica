@@ -326,9 +326,9 @@ public class FacturaElectronica implements FacturableE,Instalable{
         // Los nombres de los parametros de las funciones se obtienen en FEAFIP.pdf
         
         //URLs de autenticacion y negocio. Cambiarlas por las de producción al implementarlas en el cliente(abajo)
-        String URLWSAA = "https://wsaa.afip.gov.ar/ws/services/LoginCms";//"https://wsaahomo.afip.gov.ar/ws/services/LoginCms";
+        String URLWSAA ="https://wsaahomo.afip.gov.ar/ws/services/LoginCms";
           // Producción: https://wsaa.afip.gov.ar/ws/services/LoginCms
-        String URLWSW = "https://servicios1.afip.gov.ar/wsfev1/service.asmx";//"https://wswhomo.afip.gov.ar/wsfev1/service.asmx";
+        String URLWSW = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx";
           // Producción: https://servicios1.afip.gov.ar/wsfev1/service.asmx
         double nro;
 
@@ -573,9 +573,9 @@ public class FacturaElectronica implements FacturableE,Instalable{
         fE.archivoCrt=archivoCrt;
         fE.idCliente=idCliente;
         
-        
+        System.out.println("cantidad "+cuitCliente.length());
         if(cuitCliente.length() == 8 || cuitCliente.length()==11 || cuitCliente.length()==1 || cuitCliente.length()==7){
-            
+            if(cuitCliente.length()==1)cuitCliente="0";
         }else{
             
             cuitCliente=JOptionPane.showInputDialog(null,"Ingrese numero de CUIT/CUIL o DNI Sin puntos ni guiones ",cuitCliente);
@@ -589,6 +589,7 @@ public class FacturaElectronica implements FacturableE,Instalable{
         int tipDocumento=0;
         switch(cantCuit){
             case 1:
+                cuitCliente="0";
                 tipDocumento=99;
                 break;
             case 11:
