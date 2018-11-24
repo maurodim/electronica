@@ -5,13 +5,16 @@
  */
 package objetos;
 
-import Configuracion.Propiedades;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author mauro
  */
 public class EncabezadoPdf {
+
     private final String nombreComercio;
     private final String razonSocial;
     private final String direccion;
@@ -26,21 +29,33 @@ public class EncabezadoPdf {
     public EncabezadoPdf(int punto, double numero) {
         this.punto = punto;
         this.numero = numero;
-        this.nombreComercio=Propiedades.getNOMBRECOMERCIO();
-        this.razonSocial=Propiedades.getNOMBRECOMERCIO();
-        this.direccion=Propiedades.getDIRECCION();
-        this.telefono=Propiedades.getTELEFONO();
-        this.cuit=Propiedades.getCUIT();
-        this.ingresosBrutos=Propiedades.getINGBRUTOS();
-        this.inicioActividades=Propiedades.getINICIOACT();
-        this.condicionIva="Responsable Inscripto";
+        this.nombreComercio="";
+        this.condicionIva="";
+        this.cuit="";
+        this.direccion="";
+        this.ingresosBrutos="";
+        this.inicioActividades="";
+        this.razonSocial="";
+        this.telefono="";
+    }
+
+    public EncabezadoPdf(String nombreComercio, String razonSocial, String direccion, String telefono, int punto, double numero, String cuit, String ingresosBrutos, String inicioActividades, String condicionIva) {
+        this.nombreComercio = nombreComercio;
+        this.razonSocial = razonSocial;
+        this.direccion = direccion;
+        this.telefono = telefono;
+        this.punto = punto;
+        this.numero = numero;
+        this.cuit = cuit;
+        this.ingresosBrutos = ingresosBrutos;
+        this.inicioActividades = inicioActividades;
+        this.condicionIva = condicionIva;
     }
 
     public String getCondicionIva() {
         return condicionIva;
     }
-    
-    
+
     public String getNombreComercio() {
         return nombreComercio;
     }
@@ -76,5 +91,5 @@ public class EncabezadoPdf {
     public String getInicioActividades() {
         return inicioActividades;
     }
-    
+
 }
