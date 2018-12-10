@@ -7,7 +7,6 @@ import feafip.bi.Iwsfev1;
 import feafip.bi.TipoComprobante;
 import interfaces.FacturableE;
 import interfaces.Instalable;
-import interfaces.Transaccionable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
